@@ -14,11 +14,7 @@ A stand-alone part of the [TAO](https://xtao.org)-JSON interoperability project.
 
 Part of the TAO-[Deno](https://deno.land/) project.
 
-## Version
-
-`v0+2021-06-20+beta`
-
-Version `0` from `2021-06-20`, `beta`.
+## Status
 
 Version `0` means that some of the parser's API might still change before reaching version `1` which will signify a stable API.
 
@@ -31,13 +27,13 @@ It [passes standards-compliance tests](#standards-compliant) and [performs well 
 Not necessary. Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0+2021-06-20+beta/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0+2021-06-20+r1+beta/mod.js'
 ```
 
 Or from [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/tree-annotation/jsonhilo@v0+2021-06-20+beta/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/tree-annotation/jsonhilo@v0+2021-06-20+r1+beta/mod.js'
 ```
 
 This should work out of the box in Deno and the browser.
