@@ -1,4 +1,4 @@
-import {JsonHigh, JsonHighEventType} from './JsonHigh.js'
+import {JsonHigh, JsonHighEventType} from 'https://deno.land/x/jsonhilo@v0+2021-06-20+r1+beta/mod.js'
 
 const stream = JsonHigh((event) => {
   switch (event.type) {

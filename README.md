@@ -57,7 +57,7 @@ The bundle was obtained with [`deno bundle`](https://deno.land/manual/tools/bund
 See a basic example in [`demo.js`](demo.js), pasted below:
 
 ```js
-import {JsonHigh, JsonHighEventType} from './JsonHigh.js'
+import {JsonHigh, JsonHighEventType} from 'https://deno.land/x/jsonhilo@v0+2021-06-20+r1+beta/mod.js'
 const stream = JsonHigh((event) => {
   switch (event.type) {
   case JsonHighEventType.openArray:
