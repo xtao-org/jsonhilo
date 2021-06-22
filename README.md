@@ -1,6 +1,6 @@
 <img src="logo.png" alt="logo" height="128" />
 
-# JsonHilo.js
+# jsonhilo.js
 
 [Fully-featured](#features) minimal [modular](#modular) [ultra-fast](#fast) zero-dependency [low-level](#jsonlow) [lossless](#lossless) streaming [JSON](https://json.org) parser with a [high-level interface](#jsonhigh), written in [runtime-independent](#runtime-independent) JavaScript.
 
