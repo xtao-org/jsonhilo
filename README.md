@@ -2,38 +2,48 @@
 
 # jsonhilo.js
 
-[Fully-featured](#features) minimal [modular](#modular) [ultra-fast](#fast) zero-dependency [low-level](#jsonlow) [lossless](#lossless) streaming [JSON](https://json.org) parser with a [high-level interface](#jsonhigh), written in [runtime-independent](#runtime-independent) JavaScript.
+[Fast](#fast) [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML).
 
-<!-- Ultra-fast zero-dependency fully-featured minimal modular low-level lossless streaming [JSON](https://json.org) parser with a high-level interface, written in JavaScript. -->
+Minimal, [modular](#modular), and dependency-free. 
+
+Provides two interfaces: a [**hi**gh-level](#jsonhigh) one and a [**lo**w-level](#jsonlow) one.
+
+Written in [runtime-independent](#runtime-independent) JavaScript with [Deno](https://deno.land/) as the primary target.
 
 <img src="tao-json.png" alt="tao-json-logo" height="128" />
 
-A stand-alone part of the [TAO](https://xtao.org)-JSON interoperability project.
+A stand-alone part of the [TAO](https://xtao.org)-JSON project.
 
 <img src="tao-deno.png" alt="tao-deno-logo" height="128" />
 
-Part of the TAO-[Deno](https://deno.land/) project.
+Part of the TAO-Deno project.
+
+## Rationale
+
+Initially written to enable fast lossless translation between JSON and [Jevko](https://jevko.org), as no suitable JSON parser in JavaScript exists.
+
+JSON-Jevko translators are still to be implemented, but I decided to release this as a separate library, because I am also tinkering with Deno and found that there is [no streaming JSON parser available at all for Deno](https://stackoverflow.com/questions/58070346/reading-large-json-file-in-deno).
+
+So this might be especially useful in Deno land.
 
 ## Status
 
-Version `0` means that some of the parser's API might still change before reaching version `1` which will signify a stable API.
+[Passes standards-compliance tests](#standards-compliant) and [performs well in benchmarks](#fast).
 
-However, the event API is mostly stable and **the parser is suitable for use**.
-
-It [passes standards-compliance tests](#standards-compliant) and [performs well in benchmarks](#fast).
+Ready for initial battle-testing.
 
 ## Installation
 
 Not necessary. Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0+2021-06-20+r1+beta/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.1.0/mod.js'
 ```
 
-Or from [jsDelivr](https://www.jsdelivr.com/):
+Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/tree-annotation/jsonhilo@v0+2021-06-20+r1+beta/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/tree-annotation/jsonhilo@v0.1.0/mod.js'
 ```
 
 This should work out of the box in Deno and the browser.
@@ -54,36 +64,27 @@ The bundle was obtained with [`deno bundle`](https://deno.land/manual/tools/bund
 
 ## Quickstart
 
-See a basic example in [`demo.js`](demo.js), pasted below:
+See a basic example in [`demo/basic.js`](demo/basic.js), pasted below:
 
 ```js
-import {JsonHigh, JsonHighEventType} from 'https://deno.land/x/jsonhilo@v0+2021-06-20+r1+beta/mod.js'
-const stream = JsonHigh((event) => {
-  switch (event.type) {
-  case JsonHighEventType.openArray:
-  case JsonHighEventType.openObject:
-  case JsonHighEventType.closeArray:
-  case JsonHighEventType.closeObject:
-    console.log(event.type)
-    break
-  case JsonHighEventType.key:
-    console.log('key:', event.key)
-    break
-  case JsonHighEventType.value:
-    console.log('value:', typeof event.value, event.value)
-    break
-  }
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.1.0/mod.js'
+const stream = JsonHigh({
+  openArray: () => console.log('<array>'),
+  openObject: () => console.log('<object>'),
+  closeArray: () => console.log('</array>'),
+  closeObject: () => console.log('</object>'),
+  key: (key) => console.log(`<key>${key}</key>`),
+  value: (value) => console.log(`<value type="${typeof value}">${value}</value>`),
 })
-stream.push('{"array": [null, true, false, 1.2e-3, "[demo]"]}')
+stream.push('{"tuple": [null, true, false, 1.2e-3, "[demo]"]}')
 ```
 
 This uses [the simplified high-level interface](#jsonhigh) built on top of the [more powerful low-level core](#jsonlow).
 
 ## Features
 
-* TAO-style simple
+* Simple and minimal
 * Dependency-free
-* Minimal
 * [Runtime-independent](#runtime-independent)
 * [Lossless](#lossless)
 * [Modular](#modular)
@@ -94,15 +95,21 @@ This uses [the simplified high-level interface](#jsonhigh) built on top of the [
 
 ## Runtime-independent
 
-The code is written in modern JavaScript and relies upon some of its features, standard modules in particular.
+The library logic is written in modern JavaScript and relies upon some of its features, standard modules in particular.
 
 Beyond that it does not use any runtime-specific features and should work in any *modern* JavaScript environment. It was tested in Deno, Node.js, and the browser.
 
+That said, the primary target runtime is Deno, and tests depend on it.
+
 ## Lossless
 
-Unlike any other known streaming JSON parser, this one provides a [low-level](#jsonlow) interface for *lossless* parsing, i.e. it is possible to recover the *exact* input, including whitespace and string escape sequences, from parser events.
+Unlike any other known streaming JSON parser, jsonhilo provides a [low-level](#jsonlow) interface for *lossless* parsing, i.e. it is possible to recover the *exact* input, including whitespace and string escape sequences, from parser events.
 
-This feature can be used to implement accurate translators from JSON to other representations (in particular [TAO](https://xtao.org)), syntax highlighters, JSON scanners that search for substrings in strings on-the-fly, without first loading them into memory, and more.
+This feature can be used to implement accurate translators from JSON to other representations (see [Rationale](#rationale)), syntax highlighters (demo below), JSON scanners that search for substrings in strings on-the-fly, without first loading them into memory, and more.
+
+<img src="highlight.gif" alt="Highlight demo" height="320" />
+
+Pictured above is the syntax highlighting demo: [demo/highlight.js](demo/highlight.js)
 
 ## Modular
 
@@ -110,29 +117,52 @@ The library is highly modular with [a fully independent core](#jsonlow), around 
 
 ## JsonLow
 
-The core module is [**`JsonLow.js`**](JsonLow.js). It has no dependencies, so it can be used on its own. It is very minimal and is optimized for performance and accuracy. It provides the most fine-grained control over the parsing process. The events generated by the parser carry enough information to losslessly recreate the input exactly, including whitespace.
+The core module is [**`JsonLow.js`**](JsonLow.js). It has no dependencies, so it can be used on its own. It is very minimal and optimized for maximum performance and accuracy, as well as minimum memory footprint. It provides the most fine-grained control over the parsing process. The events generated by the parser carry enough information to losslessly recreate the input exactly, including whitespace.
+
+See [**JsonLow.d.ts**](JsonLow.d.ts) for type information and [demo/highlight.js](demo/highlight.js) for usage example.
+
+*Detailed description to be written.*
 
 ## JsonHigh
 
 [**`JsonHigh.js`**](JsonHigh.js) is the high-level module which provides a more convenient interface. It is composed of auxiliary modules and adapters built around the core. It is optimized for convenience and provides similar functionality and granularity to other streaming parsers, such as [clarinet](https://github.com/dscape/clarinet) or [creationix/jsonparse](https://github.com/creationix/jsonparse).
 
+See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#quickstart) for usage example.
+
+### Parameters
+
+`JsonHigh` is called with an object which contains named event handlers that are invoked during parsing. All handlers are optional and described [below](#events).
+
+### Return value
+
+`JsonHigh` returns a stream object with two methods:
+
+* `push` which accepts a JSON chunk to parse. It returns the stream object for chaining. 
+* `end` with no arguments which signals that parsing is completed. It calls the corresponding `end` event handler, passing its return value to the caller.
+
 ### Events
 
-There are 4 event types without properties which indicate start and end of structures:
+There are 4 event handlers without arguments which indicate start and end of structures:
 
-* `JsonHighEventType.openArray`: an array started (`[`)
-* `JsonHighEventType.closeArray`: an array ended (`]`)
-* `JsonHighEventType.openObject`: an object started (`{`)
-* `JsonHighEventType.closeObject`: an object ended (`}`)
+* `openArray`: an array started (`[`)
+* `closeArray`: an array ended (`]`)
+* `openObject`: an object started (`{`)
+* `closeObject`: an object ended (`}`)
 
-And 2 event types with a property which capture primitives:
+And 2 event handlers with one argument which capture primitives:
 
-* `JsonHighEventType.key`: an object's key ended. The `key` property of the event contains the key as a JavaScript string.
-* `JsonHighEventType.value`: a primitive JSON value ended. The `value` property of the event contains the corresponding JavaScript value: `true`, `false`, `null`, a number, or a string.
+* `key`: an object's key ended. The argument of the handler contains the key as a JavaScript string.
+* `value`: a primitive JSON value ended. The argument of the event contains the corresponding JavaScript value: `true`, `false`, `null`, a number, or a string.
+
+Finally, there is the argumentless `end` event handler which is called by the `end` method of the stream.
 
 ## Fast
 
-Preliminary benchmarks show that the low-level parser is on average at least as fast as [clarinet](https://github.com/dscape/clarinet), which is the fastest streaming JSON parser in JavaScript I could find.
+[xtao-org/jsonhilo-benchmarks](https://github.com/xtao-org/jsonhilo-benchmarks) contains benchmarks used to compare the performance of jsonhilo with [clarinet](https://github.com/dscape/clarinet) (the fastest streaming JSON parser in JavaScript I could find) and [jq](https://stedolan.github.io/jq/) (a fast and versatile command-line JSON processor).
+
+For validating JSON (just parsing without any further processing) jsonhilo is the fastest, before jq, which is in turn faster than clarinet.
+
+Overall for comparable tasks the low-level jsonhilo interface is up to 2x faster than clarinet, whereas the high-level interface is on par.
 
 ## Streaming-friendly
 
@@ -148,12 +178,20 @@ By default the parser is streaming-friendly by accepting the following:
 
 The [streaming-friendly features](#streaming-friendly) can be supressed by [**`Ecma404.js`**](Ecma404.js), an adapter module which provides full [ECMA-404](https://www.ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf)/[RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259) compliance.
 
-This is confirmed by passing the full [JSON Parsing Test Suite](https://github.com/nst/JSONTestSuite).
+This is confirmed by passing the [JSON Parsing Test Suite](https://github.com/nst/JSONTestSuite) by [Nicolas Seriot](https://github.com/nst), available under `test/JSONTestSuite`.
+
+Tests can be run with Deno as follows:
+
+```
+deno test --allow-read
+```
 
 ## Unicode-compatible
 
 The [core logic](#jsonlow) operates on Unicode code points -- in line with spec -- rather than code units or characters.
 
 ***
+
+Released under the [MIT](LICENSE) license.
 
 © 2021 [xtao.org](https://xtao.org)

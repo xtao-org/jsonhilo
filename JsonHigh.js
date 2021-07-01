@@ -1,16 +1,15 @@
-import {JsonEventToJsonHighEvent, JsonHighEventType} from './JsonEventToJsonHighEvent.js'
+import {JsonLowToHigh} from './JsonLowToHigh.js'
 import {JsonLow, JsonFeedbackType} from './JsonLow.js'
 import {PosInfoAdapter} from './PosInfoAdapter.js'
 
-export {JsonHighEventType}
-
-export const JsonHigh = (push, end = () => {}) => {
-  const stream = PosInfoAdapter(JsonLow(JsonEventToJsonHighEvent({push, end})))
+export const JsonHigh = (next) => {
+  const stream = PosInfoAdapter(JsonLow(JsonLowToHigh(next)))
 
   const self = {
     push(chunk) {
       for (const c of chunk) {
-        for (const f of [stream.push(c.codePointAt(0))].flat()) {
+        const feedback = [stream.push(c.codePointAt(0))].flat()
+        for (const f of feedback) {
           if (f.type === JsonFeedbackType.error) throw Error(JSON.stringify(f))
         }
       }

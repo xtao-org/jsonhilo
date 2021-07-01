@@ -39,34 +39,6 @@ const {
   _r_, _return_, _s_, _slash_, _space_, _t_, _tab_, _u_,
 } = CodePoint
 
-export const JsonEventType = {
-  openObject: 'JsonEventType.openObject',
-  openArray: 'JsonEventType.openArray',
-  openString: 'JsonEventType.openString',
-  openNumber: 'JsonEventType.openNumber',
-  openTrue: 'JsonEventType.openTrue',
-  openFalse: 'JsonEventType.openFalse',
-  openNull: 'JsonEventType.openNull',
-  closeObject: 'JsonEventType.closeObject',
-  closeArray: 'JsonEventType.closeArray',
-  closeString: 'JsonEventType.closeString',
-  // w/o codePoint
-  closeNumber: 'JsonEventType.closeNumber',
-  closeTrue: 'JsonEventType.closeTrue',
-  closeFalse: 'JsonEventType.closeFalse',
-  closeNull: 'JsonEventType.closeNull',
-
-  openKey: 'JsonEventType.openKey',
-  openHex: 'JsonEventType.openHex',
-  closeKey: 'JsonEventType.closeKey',
-  closeHex: 'JsonEventType.closeHex',
-
-  codePoint: 'JsonEventType.codePoint',
-  escape: 'JsonEventType.escape',
-  whitespace: 'JsonEventType.whitespace',
-  comma: 'JsonEventType.comma',
-  colon: 'JsonEventType.colon',
-}
 export const JsonFeedbackType = {
   error: 'JsonFeedbackType.error',
 }
@@ -106,33 +78,20 @@ export const JsonLow = (next, initialState = {}) => {
   let mode = initialState.mode ?? 'Mode._value'
   let parents = initialState.parents ?? ['Parent.top']
   let hexIndex = initialState.hexIndex ?? 0
-  let maxDepth = initialState.maxDepth ?? 1000000
-
-  const emitCode = (code) => next.push({type: JsonEventType.codePoint, codePoint: code})
-  const emitWhitespace = (code) => next.push({type: JsonEventType.whitespace, codePoint: code})
-  const changemit = (type, nextMode, code) => {
-    mode = nextMode
-    return next.push({type, codePoint: code})
-  }
-  const changemitCode = (code, nextMode) => {
-    mode = nextMode
-    return next.push({type: JsonEventType.codePoint, codePoint: code})
-  }
-  const emitCloseValue = (type, code) => {
-    mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
-    return next.push({type, codePoint: code})
-  }
-  const emitCloseNumber = () => {
-    mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
-    return next.push({type: JsonEventType.closeNumber})
-  }
+  let maxDepth = initialState.maxDepth ?? 65536
 
   const fraction = (code) => {
-    if (code === _dot_) return changemitCode(code, 'Mode.dot_')
+    if (code === _dot_) {
+      mode = 'Mode.dot_'
+      return next.codePoint?.(code)
+    }
     return exponent(code)
   }
   const exponent = (code) => {
-    if (code === _e_ || code === _E_) return changemitCode(code, 'Mode.exponent_')
+    if (code === _e_ || code === _E_) {
+      mode = 'Mode.exponent_'
+      return next.codePoint?.(code)
+    }
     return number(code)
   }
   /** 
@@ -141,7 +100,8 @@ export const JsonLow = (next, initialState = {}) => {
    * so we have to emit an event and handle the token 
    */
   const number = (code) => {
-    emitCloseNumber()
+    mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+    next.closeNumber?.()
     return self.push(code)
   }
   
@@ -152,10 +112,16 @@ export const JsonLow = (next, initialState = {}) => {
   const closeParent = (code) => {
     const parent = parents.pop()
     if (code === _closeCurly_) {
-      if (parent === 'Parent.object') return emitCloseValue(JsonEventType.closeObject, code)
+      if (parent === 'Parent.object') {
+        mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+        return next.closeObject?.(code)
+      }
     } 
     if (code === _closeSquare_) {
-      if (parent === 'Parent.array') return emitCloseValue(JsonEventType.closeArray, code)
+      if (parent === 'Parent.array') {
+        mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+        return next.closeArray?.(code)
+      }
     }
     return unexpected(code, `in ${parentToString(parent)}`)
   }
@@ -168,22 +134,39 @@ export const JsonLow = (next, initialState = {}) => {
             if (parents.length >= maxDepth) return maxDepthExceeded()
             parents.push('Parent.object')
             parents.push('Parent.key')
-            return changemit(JsonEventType.openObject, 'Mode._key', code)
+            mode = 'Mode._key'
+            return next.openObject?.(code)
           }
           case _openSquare_: {
             if (parents.length >= maxDepth) return maxDepthExceeded()
             parents.push('Parent.array')
-            return changemit(JsonEventType.openArray, 'Mode._value', code)
+            mode = 'Mode._value'
+            return next.openArray?.(code)
           }
-          case _quoteMark_: return changemit(JsonEventType.openString, 'Mode.string_', code)
-          case _t_: return changemit(JsonEventType.openTrue, 'Mode.t_rue', code)
-          case _f_: return changemit(JsonEventType.openFalse, 'Mode.f_alse', code)
-          case _n_: return changemit(JsonEventType.openNull, 'Mode.n_ull', code)
-          case _minus_: return changemit(JsonEventType.openNumber, 'Mode.minus_', code)
-          case _0_: return changemit(JsonEventType.openNumber, 'Mode.zero_', code)
+          case _quoteMark_: 
+            mode = 'Mode.string_'
+            return next.openString?.(code)
+          case _t_: 
+            mode = 'Mode.t_rue'
+            return next.openTrue?.(code)
+          case _f_: 
+            mode = 'Mode.f_alse'
+            return next.openFalse?.(code)
+          case _n_: 
+            mode = 'Mode.n_ull'
+            return next.openNull?.(code)
+          case _minus_: 
+            mode = 'Mode.minus_'
+            return next.openNumber?.(code)
+          case _0_: 
+            mode = 'Mode.zero_'
+            return next.openNumber?.(code)
           default:
-            if (isOneNine(code)) return changemit(JsonEventType.openNumber, 'Mode.onenine_', code)
-            if (isWhitespace(code)) return emitWhitespace(code)
+            if (isOneNine(code)) {
+              mode = 'Mode.onenine_'
+              return next.openNumber?.(code)
+            }
+            if (isWhitespace(code)) return next.whitespace?.(code)
             return closeParent(code)
         }
         case 'Mode.value_':
@@ -191,37 +174,53 @@ export const JsonLow = (next, initialState = {}) => {
             const parent = parents[parents.length - 1]
             if (parent === 'Parent.object') {
               parents.push('Parent.key')
-              return changemit(JsonEventType.comma, 'Mode._key', code)
+              mode = 'Mode._key'
+              return next.comma?.(code)
             } 
-            if (parent === 'Parent.array') return changemit(JsonEventType.comma, 'Mode._value', code)
+            if (parent === 'Parent.array') {
+              mode = 'Mode._value'
+              return next.comma?.(code)
+            }
             return error(`Invalid parser state! Unexpected parent ${parent}.`)
           }
-          if (isWhitespace(code)) return emitWhitespace(code)
+          if (isWhitespace(code)) return next.whitespace?.(code)
           return closeParent(code)
         case 'Mode._key':
-          if (code === _quoteMark_) return changemit(JsonEventType.openKey, 'Mode.string_', code)
+          if (code === _quoteMark_) {
+            mode = 'Mode.string_'
+            return next.openKey?.(code)
+          }
           if (code === _closeCurly_) {
             parents.pop()
             parents.pop()
-            return emitCloseValue(JsonEventType.closeObject, code)
+            mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+            return next.closeObject?.(code)
           } 
-          if (isWhitespace(code)) return emitWhitespace(code)
+          if (isWhitespace(code)) return next.whitespace?.(code)
           return unexpected(code, 'in an object', ['"', '}', 'whitespace'])
         case 'Mode.key_':
           if (code === _colon_) {
             parents.pop()
-            return changemit(JsonEventType.colon, 'Mode._value', code)
+            mode = 'Mode._value'
+            return next.colon?.(code)
           } 
-          if (isWhitespace(code)) return emitWhitespace(code)
+          if (isWhitespace(code)) return next.whitespace?.(code)
           return unexpected(code, 'after key', [':', 'whitespace'])
         case 'Mode.string_':
           if (code === _quoteMark_) {
             const parent = parents[parents.length - 1]
-            if (parent === 'Parent.key') return changemit(JsonEventType.closeKey, 'Mode.key_', code)
-            return emitCloseValue(JsonEventType.closeString, code)
+            if (parent === 'Parent.key') {
+              mode = 'Mode.key_'
+              return next.closeKey?.(code)
+            }
+            mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+            return next.closeString?.(code)
           } 
-          if (code === _backslash_) return changemit(JsonEventType.escape, 'Mode.escape_', code)
-          if (code >= 0x0020 && code <= 0x10ffff) return emitCode(code)
+          if (code === _backslash_) {
+            mode = 'Mode.escape_'
+            return next.escape?.(code)
+          }
+          if (code >= 0x0020 && code <= 0x10ffff) return next.codePoint?.(code)
           return unexpected(code, 'in a string', ['"', '\\', 'a code point 0x0020 thru 0x10ffff'])
         case 'Mode.escape_':
           if (
@@ -229,8 +228,14 @@ export const JsonLow = (next, initialState = {}) => {
             code === _backslash_ || code === _t_ ||
             code === _slash_ || code === _b_ ||
             code === _f_ || code === _r_
-          ) return changemitCode(code, 'Mode.string_')
-          if (code === _u_) return changemit(JsonEventType.openHex, 'Mode.hex_', code)
+          ) {
+            mode = 'Mode.string_'
+            return next.codePoint?.(code)
+          }
+          if (code === _u_) {
+            mode = 'Mode.hex_'
+            return next.openHex?.(code)
+          }
           return unexpected(code, 'after escape', ['"', 'n', '\\', 't', '/', 'b', 'f', 'r', 'u'])
         case 'Mode.hex_':
           if (
@@ -240,68 +245,120 @@ export const JsonLow = (next, initialState = {}) => {
           ) {
             if (hexIndex < 3) {
               hexIndex += 1
-              return emitCode(code)
+              return next.codePoint?.(code)
             }
             hexIndex = 0
-            return changemit(JsonEventType.closeHex, 'Mode.string_', code)
+            mode = 'Mode.string_'
+            return next.closeHex?.(code)
           }
           return unexpected(code, `at index ${hexIndex} of a hexadecimal escape sequence`, [['a', 'f'], ['A', 'F'], ['0', '9']])
         case 'Mode.minus_':
-          if (code === _0_) return changemitCode(code, 'Mode.zero_')
-          if (isOneNine(code)) return changemitCode(code, 'Mode.onenine_')
+          if (code === _0_) {
+            mode = 'Mode.zero_'
+            return next.codePoint?.(code)
+          }
+          if (isOneNine(code)) {
+            mode = 'Mode.onenine_'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `after '-'`, [['0', '9']])
         case 'Mode.zero_': return fraction(code)
         case 'Mode.onenine_':
-          if (isZeroNine(code)) return changemitCode(code, 'Mode.onenineDigit_')
-          else return fraction(code)
+          if (isZeroNine(code)) {
+            mode = 'Mode.onenineDigit_'
+            return next.codePoint?.(code)
+          }
+          return fraction(code)
         case 'Mode.dot_':
-          if (isZeroNine(code)) return changemitCode(code, 'Mode.digitDotDigit_')
+          if (isZeroNine(code)) {
+            mode = 'Mode.digitDotDigit_'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `after '.'`, [['0', '9']])
         case 'Mode.exponent_':
-          if (code === _plus_ || code === _minus_) return changemitCode(code, 'Mode.exponentSign_')
-          if (isZeroNine(code)) return changemitCode(code, 'Mode.exponentSignDigit_')
+          if (code === _plus_ || code === _minus_) {
+            mode = 'Mode.exponentSign_'
+            return next.codePoint?.(code)
+          }
+          if (isZeroNine(code)) {
+            mode = 'Mode.exponentSignDigit_'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `after exponent`, ['+', '-', ['0', '9']])
         case 'Mode.exponentSign_':
-          if (isZeroNine(code)) return changemitCode(code, 'Mode.exponentSignDigit_')
+          if (isZeroNine(code)) {
+            mode = 'Mode.exponentSignDigit_'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `after exponent sign`, [['0', '9']])
         case 'Mode.onenineDigit_':
-          if (isZeroNine(code)) return emitCode(code)
+          if (isZeroNine(code)) return next.codePoint?.(code)
           return fraction(code) 
         case 'Mode.digitDotDigit_':
-          if (isZeroNine(code)) return emitCode(code)
+          if (isZeroNine(code)) return next.codePoint?.(code)
           return exponent(code)
         case 'Mode.exponentSignDigit_':
-          if (isZeroNine(code)) return emitCode(code)
+          if (isZeroNine(code)) return next.codePoint?.(code)
           return number(code)
         case 'Mode.t_rue':
-          if (code === _r_) return changemitCode(code, 'Mode.tr_ue')
+          if (code === _r_) {
+            mode = 'Mode.tr_ue'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `at the second position in true`, ['r'])
         case 'Mode.tr_ue':
-          if (code === _u_) return changemitCode(code, 'Mode.tru_e')
+          if (code === _u_) {
+            mode = 'Mode.tru_e'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `at the third position in true`, ['u'])
         case 'Mode.tru_e':
-          if (code === _e_) return emitCloseValue(JsonEventType.closeTrue, code)
+          if (code === _e_) {
+            mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+            return next.closeTrue?.(code)
+          }
           return unexpected(code, `at the fourth position in true`, ['e'])
         case 'Mode.f_alse':
-          if (code === _a_) return changemitCode(code, 'Mode.fa_lse')
+          if (code === _a_) {
+            mode = 'Mode.fa_lse'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `at the second position in false`, ['a'])
         case 'Mode.fa_lse':
-          if (code === _l_) return changemitCode(code, 'Mode.fal_se')
+          if (code === _l_) {
+            mode = 'Mode.fal_se'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `at the third position in false`, ['l'])
         case 'Mode.fal_se':
-          if (code === _s_) return changemitCode(code, 'Mode.fals_e')
+          if (code === _s_) {
+            mode = 'Mode.fals_e'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `at the fourth position in false`, ['s'])
         case 'Mode.fals_e':
-          if (code === _e_) return emitCloseValue(JsonEventType.closeFalse, code)
+          if (code === _e_) {
+            mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+            return next.closeFalse?.(code)
+          }
           return unexpected(code, `at the fifth position in false`, ['e'])
         case 'Mode.n_ull':
-          if (code === _u_) return changemitCode(code, 'Mode.nu_ll')
+          if (code === _u_) {
+            mode = 'Mode.nu_ll'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `at the second position in null`, ['u'])
         case 'Mode.nu_ll':
-          if (code === _l_) return changemitCode(code, 'Mode.nul_l')
+          if (code === _l_) {
+            mode = 'Mode.nul_l'
+            return next.codePoint?.(code)
+          }
           return unexpected(code, `at the third position in null`, ['l'])
         case 'Mode.nul_l':
-          if (code === _l_) return emitCloseValue(JsonEventType.closeNull, code)
+          if (code === _l_) {
+            mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+            return next.closeNull?.(code)
+          }
           return unexpected(code, `at the fourth position in null`, ['l'])
         default: return error(`Invalid parser mode: ${mode}`)
       }
@@ -315,7 +372,7 @@ export const JsonLow = (next, initialState = {}) => {
       }
 
       switch (mode) {
-        case 'Mode._value': return next.end()
+        case 'Mode._value': return next.end?.()
         case 'Mode.key_': return error('a key/object left unclosed!')
         case 'Mode._key': return unexpectedEnd('an object left unclosed!')
         case 'Mode.exponentSignDigit_':
@@ -323,8 +380,9 @@ export const JsonLow = (next, initialState = {}) => {
         case 'Mode.onenineDigit_':
         case 'Mode.digitDotDigit_':
         case 'Mode.zero_':
-          emitCloseNumber()
-          return next.end()
+          mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+          next.closeNumber?.()
+          return next.end?.()
         case 'Mode.minus_':
         case 'Mode.dot_': 
         case 'Mode.exponent_':
