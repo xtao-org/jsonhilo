@@ -1,6 +1,6 @@
 <img src="logo.png" alt="logo" height="128" />
 
-# jsonhilo.js
+# JsonHilo.js
 
 [Fast](#fast) [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML).
 
@@ -103,7 +103,7 @@ That said, the primary target runtime is Deno, and tests depend on it.
 
 ## Lossless
 
-Unlike any other known streaming JSON parser, jsonhilo provides a [low-level](#jsonlow) interface for *lossless* parsing, i.e. it is possible to recover the *exact* input, including whitespace and string escape sequences, from parser events.
+Unlike any other known streaming JSON parser, JsonHilo provides a [low-level](#jsonlow) interface for *lossless* parsing, i.e. it is possible to recover the *exact* input, including whitespace and string escape sequences, from parser events.
 
 This feature can be used to implement accurate translators from JSON to other representations (see [Rationale](#rationale)), syntax highlighters (demo below), JSON scanners that search for substrings in strings on-the-fly, without first loading them into memory, and more.
 
@@ -125,7 +125,7 @@ See [**JsonLow.d.ts**](JsonLow.d.ts) for type information and [demo/highlight.js
 
 ## JsonHigh
 
-[**`JsonHigh.js`**](JsonHigh.js) is the high-level module which provides a more convenient interface. It is composed of auxiliary modules and adapters built around the core. It is optimized for convenience and provides similar functionality and granularity to other streaming parsers, such as [clarinet](https://github.com/dscape/clarinet) or [creationix/jsonparse](https://github.com/creationix/jsonparse).
+[**`JsonHigh.js`**](JsonHigh.js) is the high-level module which provides a more convenient interface. It is composed of auxiliary modules and adapters built around the core. It is optimized for convenience and provides similar functionality and granularity to other streaming parsers, such as [Clarinet](https://github.com/dscape/clarinet) or [creationix/jsonparse](https://github.com/creationix/jsonparse).
 
 See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#quickstart) for usage example.
 
@@ -158,11 +158,11 @@ Finally, there is the argumentless `end` event handler which is called by the `e
 
 ## Fast
 
-[xtao-org/jsonhilo-benchmarks](https://github.com/xtao-org/jsonhilo-benchmarks) contains benchmarks used to compare the performance of jsonhilo with [clarinet](https://github.com/dscape/clarinet) (the fastest streaming JSON parser in JavaScript I could find) and [jq](https://stedolan.github.io/jq/) (a fast and versatile command-line JSON processor).
+[xtao-org/jsonhilo-benchmarks](https://github.com/xtao-org/jsonhilo-benchmarks) contains benchmarks used to compare the performance of JsonHilo with [Clarinet](https://github.com/dscape/clarinet) (the fastest streaming JSON parser in JavaScript I could find) and [jq](https://stedolan.github.io/jq/) (a fast and versatile command-line JSON processor).
 
-For validating JSON (just parsing without any further processing) jsonhilo is the fastest, before jq, which is in turn faster than clarinet.
+For validating JSON (just parsing without any further processing) JsonHilo is the fastest, before jq, which is in turn faster than Clarinet.
 
-Overall for comparable tasks the low-level jsonhilo interface is up to 2x faster than clarinet, whereas the high-level interface is on par.
+Overall for comparable tasks the low-level JsonHilo interface is up to 2x faster than Clarinet, whereas the high-level interface is on par.
 
 ## Streaming-friendly
 
