@@ -1,3 +1,17 @@
 {
-  "type": "module"
+  "type": "module",
+  "name": "jsonhilo",
+  "version": "0.1.2",
+  "main": "mod.js",
+  "private": true,
+  "devDependencies": {},
+  "scripts": {
+    "test": "deno test --allow-read"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xtao-org/jsonhilo.git"
+  },
+  "author": "Darius JJ Chuck",
+  "license": "MIT"
 }
