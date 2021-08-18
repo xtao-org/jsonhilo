@@ -3,8 +3,8 @@ export const PosInfoAdapter = (stream) => {
   let pos = 0, line = 0, col = 0
   
   const self = {
-    push: (code) => {
-      const ret = stream.push(code)
+    codePoint: (code) => {
+      const ret = stream.codePoint(code)
       const wret = {
         pos,
         line,

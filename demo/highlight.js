@@ -116,10 +116,10 @@ while (true) {
       partialCodePoint |= bits << (bytesRemain * 6)
 
       if (bytesRemain === 0) {
-        stream.push(partialCodePoint)
+        stream.codePoint(partialCodePoint)
       }
     } 
-    else if (byte < 128) stream.push(byte)
+    else if (byte < 128) stream.codePoint(byte)
     else {
       if ((byte >> 5) === 0b110) {
         bytesRemain = 1

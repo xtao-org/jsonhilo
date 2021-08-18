@@ -19,7 +19,7 @@ for (const dirEntry of Deno.readDirSync(path)) {
     let failedAsExpected = false
     const codePoints = [...str].map(c => c.codePointAt(0))
     for (let i = 0; i < codePoints.length; ++i) {
-      const ret = stream.push(codePoints[i])
+      const ret = stream.codePoint(codePoints[i])
       if (ret.type === JsonFeedbackType.error) {
         if (name.startsWith('y_')) {
           console.error(ret)

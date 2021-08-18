@@ -8,7 +8,7 @@ export const JsonHigh = (next) => {
   const self = {
     push(chunk) {
       for (const c of chunk) {
-        const feedback = [stream.push(c.codePointAt(0))].flat()
+        const feedback = [stream.codePoint(c.codePointAt(0))].flat()
         for (const f of feedback) {
           if (f.type === JsonFeedbackType.error) throw Error(JSON.stringify(f))
         }

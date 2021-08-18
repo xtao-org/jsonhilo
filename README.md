@@ -2,29 +2,15 @@
 
 # JsonHilo.js
 
-[Fast](#fast) [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML).
+Minimal [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML).
 
-Minimal, [modular](#modular), and dependency-free. 
+[Fast](#fast), [modular](#modular), and dependency-free. 
 
 Provides two interfaces: a [**hi**gh-level](#jsonhigh) one and a [**lo**w-level](#jsonlow) one.
 
-Written in [runtime-independent](#runtime-independent) JavaScript with [Deno](https://deno.land/) as the primary target.
+Written in [runtime-independent](#runtime-independent) JavaScript. 
 
-<img src="tao-json.png" alt="tao-json-logo" height="128" />
-
-A stand-alone part of the [TAO](https://xtao.org)-JSON project.
-
-<img src="tao-deno.png" alt="tao-deno-logo" height="128" />
-
-Part of the TAO-Deno project.
-
-## Rationale
-
-Initially written to enable fast lossless translation between JSON and [Jevko](https://jevko.org), as no suitable JSON parser in JavaScript exists.
-
-JSON-Jevko translators are still to be implemented, but I decided to release this as a separate library, because I am also tinkering with Deno and found that there is [no streaming JSON parser available at all for Deno](https://stackoverflow.com/questions/58070346/reading-large-json-file-in-deno).
-
-So this might be especially useful in Deno land.
+Works in [Deno](https://deno.land/), [Node.js](https://nodejs.org), and the browser.
 
 ## Status
 
@@ -34,19 +20,25 @@ Ready for initial battle-testing.
 
 ## Installation
 
-Not necessary. Import modules directly from [deno.land/x](https://deno.land/x):
+### Node.js
+
+```
+npm install xtao-org/jsonhilo#semver:0.2.0
+```
+
+### Deno and the browser
+
+Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.1.0/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.2.0/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/tree-annotation/jsonhilo@v0.1.0/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/tree-annotation/jsonhilo@v0.2.0/mod.js'
 ```
-
-This should work out of the box in Deno and the browser.
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
 
@@ -67,7 +59,7 @@ The bundle was obtained with [`deno bundle`](https://deno.land/manual/tools/bund
 See a basic example in [`demo/basic.js`](demo/basic.js), pasted below:
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.1.0/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.2.0/mod.js'
 const stream = JsonHigh({
   openArray: () => console.log('<array>'),
   openObject: () => console.log('<object>'),
@@ -190,8 +182,22 @@ deno test --allow-read
 
 The [core logic](#jsonlow) operates on Unicode code points -- in line with spec -- rather than code units or characters.
 
+## Rationale
+
+Initially written to enable fast lossless translation between JSON and [Jevko](https://jevko.org), as no suitable JSON parser in JavaScript exists.
+
+I decided to release this as a separate library, because I was tinkering with Deno and found that there was [no streaming JSON parser available at all for Deno](https://stackoverflow.com/questions/58070346/reading-large-json-file-in-deno).
+
 ***
 
 Released under the [MIT](LICENSE) license.
+
+<img src="tao-json.png" alt="tao-json-logo" height="128" />
+
+A stand-alone part of the [TAO](https://xtao.org)-JSON project.
+
+<img src="tao-deno.png" alt="tao-deno-logo" height="128" />
+
+Part of the TAO-Deno project.
 
 © 2021 [xtao.org](https://xtao.org)

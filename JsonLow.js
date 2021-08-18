@@ -102,7 +102,7 @@ export const JsonLow = (next, initialState = {}) => {
   const number = (code) => {
     mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
     next.closeNumber?.()
-    return self.push(code)
+    return self.codePoint(code)
   }
   
   const maxDepthExceeded = () => error(
@@ -127,7 +127,7 @@ export const JsonLow = (next, initialState = {}) => {
   }
 
   const self = {
-    push: (code) => {
+    codePoint: (code) => {
       switch (mode) {
         case 'Mode._value': switch (code) {
           case _openCurly_: {
