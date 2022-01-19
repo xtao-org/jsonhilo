@@ -150,11 +150,31 @@ Finally, there is the argumentless `end` event handler which is called by the `e
 
 ## Fast
 
-[xtao-org/jsonhilo-benchmarks](https://github.com/xtao-org/jsonhilo-benchmarks) contains benchmarks used to compare the performance of JsonHilo with [Clarinet](https://github.com/dscape/clarinet) (the fastest streaming JSON parser in JavaScript I could find) and [jq](https://stedolan.github.io/jq/) (a fast and versatile command-line JSON processor).
+Achieving optimal performance was a design goal of JsonHilo, albeit not at the expense of simplicity and correctness.
 
-For validating JSON (just parsing without any further processing) JsonHilo is the fastest, before jq, which is in turn faster than Clarinet.
+I believe this design goal was realized and for applications without extreme performance requirements JsonHilo should be more than fast enough.
 
-Overall for comparable tasks the low-level JsonHilo interface is up to 2x faster than Clarinet, whereas the high-level interface is on par.
+It may be worth noting however that using pure JavaScript for extremely performance-sensitive applications is ill-advised and that nothing can replace individual case-by-case benchmarks.
+
+It is difficult to find a parser that can be sensibly compared with JsonHilo. The one that comes the closest and is fairly widely known is [Clarinet](https://github.com/dscape/clarinet). It is the only low-level streaming JSON parser featured on [JSON.org](https://www.json.org) and the fastest one I could find.
+
+[xtao-org/jsonhilo-benchmarks](https://github.com/xtao-org/jsonhilo-benchmarks) contains simple benchmarks used to compare the performance of JsonHilo with Clarinet and [jq](https://stedolan.github.io/jq/) (a fast and versatile command-line JSON processor).
+
+According to these benchmarks, for validating JSON (just parsing without any further processing) JsonHilo is the fastest, before jq, which is in turn faster than Clarinet. Overall for comparable tasks the low-level JsonHilo interface is up to 2x faster than Clarinet, whereas the high-level interface is on par.
+
+Again, these results need to be taken with a grain of salt, and there is no replacement for individual benchmarks. Use whatever suits your case best. In most cases, relative performance should not be the only factor to take into account.
+
+Factors which make a fair comparison between JsonHilo and Clarinet problematic are mentioned below.
+
+### Differences between JsonHilo and Clarinet
+
+The major differences that make the comparison of the two problematic are:
+
+* [Clarinet is not fully ECMA-404-compliant](https://github.com/dscape/clarinet/issues/49), as measured by [JSON Parsing Test Suite by Nicolas Seriot](https://github.com/nst/JSONTestSuite) -- it accepts certain invalid JSON and rejects certain valid JSON. JsonHilo is designed to parse the JSON grammar correctly and so [can pass the ECMA-404-compliance test suite](#standards-compliant). JsonHilo is overall safer to use with unknown inputs -- it can very well be used as a validator.
+* JsonHilo fundamentally operates on individual Unicode code points as opposed to strings, chunks, or characters. Performance-wise this may be an advantage or a disadvantage, depending on how the input is structured (it may need conversion). 
+* Even though low-level processing with JsonHilo may be overall significantly faster than Clarinet, the fact that the former does not use regular expressions to parse the input while the latter does may lead to a narrower performance gap between the two.
+* JsonHilo is overall simpler in terms of code complexity, making it easier to adjust or audit. The code is also significantly smaller in size than Clarinet, even taking into account the optional high-level interfaces laid on top of the tiny core.
+* JsonHilo's core is more low-level and amenable to extension.
 
 ## Streaming-friendly
 

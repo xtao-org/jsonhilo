@@ -406,7 +406,7 @@ export const JsonLow = (next, initialState = {}) => {
     },
     state: () => {
       const downstream = next.state?.()
-      return JSON.stringify({mode, parents, downstream})
+      return {mode, parents, downstream}
     },
   }
   return self
