@@ -220,4 +220,4 @@ A stand-alone part of the [TAO](https://xtao.org)-JSON project.
 
 Part of the TAO-Deno project.
 
-© 2021 [xtao.org](https://xtao.org)
+© 2022 [xtao.org](https://xtao.org)
