@@ -150,9 +150,7 @@ Finally, there is the argumentless `end` event handler which is called by the `e
 
 ## Fast
 
-Achieving optimal performance was a design goal of JsonHilo, albeit not at the expense of simplicity and correctness.
-
-I believe this design goal was realized and for applications without extreme performance requirements JsonHilo should be more than fast enough.
+Achieving optimal performance without sacrificing simplicity and correctness was a design goal of JsonHilo. This goal was realized and for applications without extreme performance requirements JsonHilo should be more than fast enough.
 
 It may be worth noting however that using pure JavaScript for extremely performance-sensitive applications is ill-advised and that nothing can replace individual case-by-case benchmarks.
 
