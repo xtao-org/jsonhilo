@@ -2,6 +2,8 @@
 
 # JsonHilo.js
 
+[![](https://data.jsdelivr.com/v1/package/gh/xtao-org/jsonhilo/badge)](https://www.jsdelivr.com/package/gh/xtao-org/jsonhilo)
+
 Minimal [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML).
 
 [Fast](#fast), [modular](#modular), and dependency-free. 
@@ -205,6 +207,10 @@ The [core logic](#jsonlow) operates on Unicode code points -- in line with spec 
 Initially written to enable fast lossless translation between JSON and [Jevko](https://jevko.org), as no suitable JSON parser in JavaScript exists.
 
 I decided to release this as a separate library, because I was tinkering with Deno and found that there was [no streaming JSON parser available at all for Deno](https://stackoverflow.com/questions/58070346/reading-large-json-file-in-deno).
+
+## See also
+
+[JsonStrum](https://github.com/xtao-org/jsonstrum) -- a high-level wrapper over JsonHilo which emits fully parsed objects and arrays. 
 
 ***
 
