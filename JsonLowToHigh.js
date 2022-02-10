@@ -27,11 +27,11 @@ export const JsonLowToHigh = (next) => {
       mode = 'number'
       return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
-    openObject: () => {
-      return valFeedback(next.openObject?.())
+    openObject: (_, depth) => {
+      return valFeedback(next.openObject?.(depth))
     },
-    openArray: () => {
-      return valFeedback(next.openArray?.())
+    openArray: (_, depth) => {
+      return valFeedback(next.openArray?.(depth))
     },
     closeObject: () => {
       return valFeedback(next.closeObject?.())

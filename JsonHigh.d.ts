@@ -6,8 +6,8 @@ export type JsonHigh = <Feedback, End>(
   end(): End,
 }
 export type JsonHighHandlers<Feedback, End> = {
-  openArray?: JsonHighHandler<Feedback>,
-  openObject?: JsonHighHandler<Feedback>,
+  openArray?: (depth: number) => Feedback,
+  openObject?: (depth: number) => Feedback,
   closeArray?: JsonHighHandler<Feedback>,
   closeObject?: JsonHighHandler<Feedback>,
   key?: (key: string) => Feedback,
