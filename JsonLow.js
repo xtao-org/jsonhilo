@@ -113,14 +113,16 @@ export const JsonLow = (next, initialState = {}) => {
     const parent = parents.pop()
     if (code === _closeCurly_) {
       if (parent === 'Parent.object') {
-        mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
-        return next.closeObject?.(code)
+        const {length} = parents
+        mode = parents[length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+        return next.closeObject?.(code, length)
       }
     } 
     if (code === _closeSquare_) {
       if (parent === 'Parent.array') {
-        mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
-        return next.closeArray?.(code)
+        const {length} = parents
+        mode = parents[length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+        return next.closeArray?.(code, length)
       }
     }
     return unexpected(code, `in ${parentToString(parent)}`)
@@ -195,8 +197,9 @@ export const JsonLow = (next, initialState = {}) => {
           if (code === _closeCurly_) {
             parents.pop()
             parents.pop()
-            mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
-            return next.closeObject?.(code)
+            const {length} = parents
+            mode = parents[length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
+            return next.closeObject?.(code, length)
           } 
           if (isWhitespace(code)) return next.whitespace?.(code)
           return unexpected(code, 'in an object', ['"', '}', 'whitespace'])

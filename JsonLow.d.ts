@@ -20,8 +20,8 @@ export type JsonLowHandlers<Feedback, End> = {
   openTrue?: JsonLowHandler<Feedback>,
   openFalse?: JsonLowHandler<Feedback>,
   openNull?: JsonLowHandler<Feedback>,
-  closeObject?: JsonLowHandler<Feedback>,
-  closeArray?: JsonLowHandler<Feedback>,
+  closeObject?: (codePoint: number, depth: number) => Feedback,
+  closeArray?: (codePoint: number, depth: number) => Feedback,
   closeString?: JsonLowHandler<Feedback>,
   // note: edge case with no codePoint or Feedback
   closeNumber?: () => void,

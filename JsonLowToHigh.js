@@ -33,11 +33,11 @@ export const JsonLowToHigh = (next) => {
     openArray: (_, depth) => {
       return valFeedback(next.openArray?.(depth))
     },
-    closeObject: () => {
-      return valFeedback(next.closeObject?.())
+    closeObject: (_, depth) => {
+      return valFeedback(next.closeObject?.(depth))
     },
-    closeArray: () => {
-      return valFeedback(next.closeArray?.())
+    closeArray: (_, depth) => {
+      return valFeedback(next.closeArray?.(depth))
     },
     closeTrue: () => {
       return valFeedback(next.value?.(true))
