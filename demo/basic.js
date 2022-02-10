@@ -9,7 +9,7 @@ const stream = JsonHigh({
   value: (value) => console.log(`<value type="${typeof value}">${value}</value>`),
 })
 
-stream.push('{"tuple": [null, true, false, 1.2e-3, "[demo]"]}')
+stream.chunk('{"tuple": [null, true, false, 1.2e-3, "[demo]"]}')
 
 /* OUTPUT:
 <object>

@@ -25,7 +25,7 @@ Ready for initial battle-testing.
 ### Node.js
 
 ```
-npm install xtao-org/jsonhilo#semver:0.2.0
+npm install xtao-org/jsonhilo#semver:0.3.0
 ```
 
 ### Deno and the browser
@@ -33,13 +33,13 @@ npm install xtao-org/jsonhilo#semver:0.2.0
 Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.2.0/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.0/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.2.0/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.0/mod.js'
 ```
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
@@ -61,7 +61,7 @@ The bundle was obtained with [`deno bundle`](https://deno.land/manual/tools/bund
 See a basic example in [`demo/basic.js`](demo/basic.js), pasted below:
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.2.0/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.0/mod.js'
 const stream = JsonHigh({
   openArray: () => console.log('<array>'),
   openObject: () => console.log('<object>'),
@@ -70,7 +70,7 @@ const stream = JsonHigh({
   key: (key) => console.log(`<key>${key}</key>`),
   value: (value) => console.log(`<value type="${typeof value}">${value}</value>`),
 })
-stream.push('{"tuple": [null, true, false, 1.2e-3, "[demo]"]}')
+stream.chunk('{"tuple": [null, true, false, 1.2e-3, "[demo]"]}')
 ```
 
 This uses [the simplified high-level interface](#jsonhigh) built on top of the [more powerful low-level core](#jsonlow).
@@ -131,7 +131,7 @@ See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#qu
 
 `JsonHigh` returns a stream object with two methods:
 
-* `push` which accepts a JSON chunk to parse. It returns the stream object for chaining. 
+* `chunk` which accepts a JSON chunk to parse. It returns the stream object for chaining. 
 * `end` with no arguments which signals that parsing is completed. It calls the corresponding `end` event handler, passing its return value to the caller.
 
 ### Events
