@@ -17,6 +17,9 @@ export const JsonHigh = (next) => {
     },
     end() {
       return stream.end()
+    },
+    state() {
+      return stream.state()
     }
   }
   return self
