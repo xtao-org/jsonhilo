@@ -131,17 +131,19 @@ export const JsonLow = (next, initialState = {}) => {
       switch (mode) {
         case 'Mode._value': switch (code) {
           case _openCurly_: {
-            if (parents.length >= maxDepth) return maxDepthExceeded()
+            const {length} = parents
+            if (length >= maxDepth) return maxDepthExceeded()
             parents.push('Parent.object')
             parents.push('Parent.key')
             mode = 'Mode._key'
-            return next.openObject?.(code)
+            return next.openObject?.(code, length)
           }
           case _openSquare_: {
+            const {length} = parents
             if (parents.length >= maxDepth) return maxDepthExceeded()
             parents.push('Parent.array')
             mode = 'Mode._value'
-            return next.openArray?.(code)
+            return next.openArray?.(code, length)
           }
           case _quoteMark_: 
             mode = 'Mode.string_'

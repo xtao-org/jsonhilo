@@ -8,13 +8,13 @@ export type JsonLow = <Feedback, End>(
     maxDepth: number,
   }
 ) => {
-  push(codePoint: number): Feedback,
+  codePoint(codePoint: number): Feedback,
   end(): End,
   state(): string,
 }
 export type JsonLowHandlers<Feedback, End> = {
-  openObject?: JsonLowHandler<Feedback>,
-  openArray?: JsonLowHandler<Feedback>,
+  openObject?: (codePoint: number, depth: number) => Feedback,
+  openArray?: (codePoint: number, depth: number) => Feedback,
   openString?: JsonLowHandler<Feedback>,
   openNumber?: JsonLowHandler<Feedback>,
   openTrue?: JsonLowHandler<Feedback>,
