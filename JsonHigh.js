@@ -6,7 +6,7 @@ export const JsonHigh = (next) => {
   const stream = PosInfoAdapter(JsonLow(JsonLowToHigh(next)))
 
   const self = {
-    push(chunk) {
+    chunk(chunk) {
       for (const c of chunk) {
         const feedback = [stream.codePoint(c.codePointAt(0))].flat()
         for (const f of feedback) {
@@ -17,6 +17,9 @@ export const JsonHigh = (next) => {
     },
     end() {
       return stream.end()
+    },
+    state() {
+      return stream.state()
     }
   }
   return self

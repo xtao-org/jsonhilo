@@ -8,7 +8,7 @@ export type JsonLow = <Feedback, End>(
     maxDepth: number,
   }
 ) => {
-  push(codePoint: number): Feedback,
+  codePoint(codePoint: number): Feedback,
   end(): End,
   state(): string,
 }

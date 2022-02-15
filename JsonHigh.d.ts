@@ -2,7 +2,7 @@ export declare const JsonHigh: JsonHigh
 export type JsonHigh = <Feedback, End>(
   next: JsonHighHandlers<Feedback, End>,
 ) => {
-  push(chunk: string): Feedback,
+  chunk(chunk: string): Feedback,
   end(): End,
 }
 export type JsonHighHandlers<Feedback, End> = {

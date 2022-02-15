@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "jsonhilo",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "mod.js",
   "private": true,
   "devDependencies": {},
