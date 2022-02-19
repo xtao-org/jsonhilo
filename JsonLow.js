@@ -79,6 +79,7 @@ export const JsonLow = (next, initialState = {}) => {
   let parents = initialState.parents ?? ['Parent.top']
   let hexIndex = initialState.hexIndex ?? 0
   let maxDepth = initialState.maxDepth ?? 65536
+  let isKey = initialState.isKey ?? false
 
   const fraction = (code) => {
     if (code === _dot_) {
@@ -133,7 +134,7 @@ export const JsonLow = (next, initialState = {}) => {
           case _openCurly_: {
             if (parents.length >= maxDepth) return maxDepthExceeded()
             parents.push('Parent.object')
-            parents.push('Parent.key')
+            isKey = true
             mode = 'Mode._key'
             return next.openObject?.(code)
           }
@@ -173,7 +174,7 @@ export const JsonLow = (next, initialState = {}) => {
           if (code === _comma_) {
             const parent = parents[parents.length - 1]
             if (parent === 'Parent.object') {
-              parents.push('Parent.key')
+              isKey = true
               mode = 'Mode._key'
               return next.comma?.(code)
             } 
@@ -192,7 +193,7 @@ export const JsonLow = (next, initialState = {}) => {
           }
           if (code === _closeCurly_) {
             parents.pop()
-            parents.pop()
+            isKey = false
             mode = parents[parents.length - 1] === 'Parent.top'? 'Mode._value': 'Mode.value_'
             return next.closeObject?.(code)
           } 
@@ -200,7 +201,7 @@ export const JsonLow = (next, initialState = {}) => {
           return unexpected(code, 'in an object', ['"', '}', 'whitespace'])
         case 'Mode.key_':
           if (code === _colon_) {
-            parents.pop()
+            isKey = false
             mode = 'Mode._value'
             return next.colon?.(code)
           } 
@@ -208,8 +209,7 @@ export const JsonLow = (next, initialState = {}) => {
           return unexpected(code, 'after key', [':', 'whitespace'])
         case 'Mode.string_':
           if (code === _quoteMark_) {
-            const parent = parents[parents.length - 1]
-            if (parent === 'Parent.key') {
+            if (isKey) {
               mode = 'Mode.key_'
               return next.closeKey?.(code)
             }
@@ -364,12 +364,12 @@ export const JsonLow = (next, initialState = {}) => {
       }
     },
     end: () => {
+      if (isKey) return unexpectedEnd(`a key/object left unclosed!`)
+
       const parent = parents[parents.length - 1]
-      switch (parent) {
-        case 'Parent.key': return unexpectedEnd(`a key/object left unclosed!`)
-        case 'Parent.top': break
-        default: return unexpectedEnd(`${parentToString(parent)} left unclosed!`)
-      }
+      if (parent !== 'Parent.top') return unexpectedEnd(
+        `${parentToString(parent)} left unclosed!`
+      )
 
       switch (mode) {
         case 'Mode._value': return next.end?.()
@@ -406,7 +406,7 @@ export const JsonLow = (next, initialState = {}) => {
     },
     state: () => {
       const downstream = next.state?.()
-      return {mode, parents: [...parents], downstream}
+      return {mode, parents: [...parents], isKey, downstream}
     },
   }
   return self
@@ -416,7 +416,6 @@ const parentToString = (parent) => {
   switch (parent) {
     case 'Parent.array': return 'an array'
     case 'Parent.object': return 'an object'
-    case 'Parent.key': return 'a key'
     case 'Parent.top': return 'the top-level value'
   }
 }
