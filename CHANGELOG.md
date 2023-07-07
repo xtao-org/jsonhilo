@@ -6,7 +6,7 @@ Update README quickstart example to work in Node.js.
 
 # 0.3.1
 
-No change in code.
+(Cosmetic) Introduce the isKey state flag in [#2](https://github.com/xtao-org/jsonhilo/pull/2).
 
 Created an npm package under `@xtao-org/jsonhilo`.
 

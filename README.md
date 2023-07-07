@@ -26,6 +26,8 @@ Somewhat battle-tested.
 
 ### Node.js
 
+An [npm package](https://www.npmjs.com/package/@xtao-org/jsonhilo) is available:
+
 ```
 npm i @xtao-org/jsonhilo
 ```
