@@ -16,16 +16,18 @@ Works in [Deno](https://deno.land/), [Node.js](https://nodejs.org), and the brow
 
 ## Status
 
+Stable.
+
 [Passes standards-compliance tests](#standards-compliant) and [performs well in benchmarks](#fast).
 
-Ready for initial battle-testing.
+Somewhat battle-tested.
 
 ## Installation
 
 ### Node.js
 
 ```
-npm install xtao-org/jsonhilo#semver:0.3.0
+npm i @xtao-org/jsonhilo
 ```
 
 ### Deno and the browser
@@ -33,13 +35,13 @@ npm install xtao-org/jsonhilo#semver:0.3.0
 Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.0/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.1/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.0/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.1/mod.js'
 ```
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
@@ -61,7 +63,7 @@ The bundle was obtained with [`deno bundle`](https://deno.land/manual/tools/bund
 See a basic example in [`demo/basic.js`](demo/basic.js), pasted below:
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.0/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.1/mod.js'
 const stream = JsonHigh({
   openArray: () => console.log('<array>'),
   openObject: () => console.log('<object>'),
@@ -220,8 +222,4 @@ Released under the [MIT](LICENSE) license.
 
 A stand-alone part of the [TAO](https://xtao.org)-JSON project.
 
-<img src="tao-deno.png" alt="tao-deno-logo" height="128" />
-
-Part of the TAO-Deno project.
-
-© 2022 [xtao.org](https://xtao.org)
+© 2023 [xtao.org](https://xtao.org)
