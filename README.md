@@ -35,13 +35,13 @@ npm i @xtao-org/jsonhilo
 Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.1/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.2/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.1/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.2/mod.js'
 ```
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
@@ -63,7 +63,7 @@ The bundle was obtained with [`deno bundle`](https://deno.land/manual/tools/bund
 See a basic example in [`demo/basic.js`](demo/basic.js), pasted below:
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.1/mod.js'
+import {JsonHigh} from '@xtao-org/jsonhilo'
 const stream = JsonHigh({
   openArray: () => console.log('<array>'),
   openObject: () => console.log('<object>'),

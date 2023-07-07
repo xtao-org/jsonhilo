@@ -1,3 +1,9 @@
+# 0.3.2
+
+No change in code.
+
+Update README quickstart example to work in Node.js.
+
 # 0.3.1
 
 No change in code.
