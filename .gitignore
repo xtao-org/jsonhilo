@@ -1,2 +1,5 @@
 .metals
 todo
+ignored
+node_modules
+*.tgz
