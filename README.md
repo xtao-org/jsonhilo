@@ -2,6 +2,8 @@
 
 # JsonHilo.js
 
+[`[📢 blog post]`](https://djedr.github.io/posts/jsonhilo-2021-07-29.html)
+
 [![](https://data.jsdelivr.com/v1/package/gh/xtao-org/jsonhilo/badge)](https://www.jsdelivr.com/package/gh/xtao-org/jsonhilo)
 
 Minimal [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML).
