@@ -10,6 +10,7 @@
   },
   "files": [
     "mod.js",
+    "mod.d.ts",
     "JsonLow.js",
     "JsonLow.d.ts",
     "JsonHigh.js",
