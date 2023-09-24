@@ -1,5 +1,4 @@
-export declare const CodePoint: CodePoint
-export type CodePoint = {
+export declare const CodePoint: {
   _0_: number,
   _1_: number,
   _9_: number,
@@ -40,31 +39,36 @@ export enum JsonErrorType {
   unexpected = 'JsonErrorType.unexpected',
   unexpectedEnd = 'JsonErrorType.unexpectedEnd',
 }
-export declare const error: (message: string) => {
+export interface JsonErrorFeedback {
   type: JsonFeedbackType.error,
   message: string,
 }
-export declare const unexpected: (code: number, context: string, expected: Array<string | [startChar: string, endChar: string]>) => {
+export interface JsonUnexpectedFeedback {
   type: JsonFeedbackType.error,
   errorType: JsonErrorType.unexpected,
   codePoint: number,
   context: string,
   expected: Array<string | [startChar: string, endChar: string]>,
 }
-export declare const unexpectedEnd: (context?: string, expected?: Array<string | [startChar: string, endChar: string]>) => {
+export interface JsonUnexpectedEndFeedback {
   type: JsonFeedbackType.error,
   errorType: JsonErrorType.unexpectedEnd,
   context?: string,
   expected?: Array<string | [startChar: string, endChar: string]>,
 }
+export type JsonStandardFeedback = JsonErrorFeedback | JsonUnexpectedFeedback;
+export type JsonStandardEnd = JsonErrorFeedback | JsonUnexpectedEndFeedback;
+export declare const error: (message: string) => JsonErrorFeedback
+export declare const unexpected: (code: number, context: string, expected: Array<string | [startChar: string, endChar: string]>) => JsonUnexpectedFeedback
+export declare const unexpectedEnd: (context?: string, expected?: Array<string | [startChar: string, endChar: string]>) => JsonUnexpectedEndFeedback
 export declare const isZeroNine: (code: number) => boolean
 export declare const isOneNine: (code: number) => boolean
 export declare const isWhitespace: (code: number) => boolean
 export interface JsonLowBaseConfig {
   maxDepth: number,
 }
-export interface JsonLowConfig extends JsonLowBaseConfig {
-  downstream?: JsonLowConfig,
+export interface JsonLowConfig<DownstreamConfig = unknown> extends JsonLowBaseConfig {
+  downstream?: DownstreamConfig,
 }
 export interface JsonLowBaseState {
   mode: string,
@@ -72,22 +76,21 @@ export interface JsonLowBaseState {
   isKey: boolean,
   hexIndex: number,
 }
-export interface JsonLowState extends JsonLowBaseState {
-  downstream?: JsonLowState,
+export interface JsonLowState<DownstreamState = unknown> extends JsonLowBaseState {
+  downstream?: DownstreamState,
 }
 export interface JsonLowInitialState extends Partial<JsonLowBaseState>, Partial<JsonLowBaseConfig> {
 }
-export declare const JsonLow: JsonLow
-export type JsonLow = <Feedback, End>(
+export declare const JsonLow: <Feedback, End, DownstreamState = unknown, DownstreamConfig = unknown>(
   next: JsonLowHandlers<Feedback, End>,
   initialState?: JsonLowInitialState,
 ) => {
-  codePoint(codePoint: number): Feedback,
-  end(): End,
-  state(): JsonLowState,
-  config(): JsonLowConfig,
+  codePoint(codePoint: number): Feedback | JsonStandardFeedback | undefined,
+  end(): End | JsonStandardEnd,
+  state(): JsonLowState<DownstreamState>,
+  config(): JsonLowConfig<DownstreamConfig>,
 }
-export type JsonLowHandlers<Feedback, End> = {
+export type JsonLowHandlers<Feedback, End, DownstreamState = unknown, DownstreamConfig = unknown> = {
   openObject?: JsonLowHandler<Feedback>,
   openArray?: JsonLowHandler<Feedback>,
   openString?: JsonLowHandler<Feedback>,
@@ -115,8 +118,8 @@ export type JsonLowHandlers<Feedback, End> = {
   comma?: JsonLowHandler<Feedback>,
   colon?: JsonLowHandler<Feedback>,
 
-  state?: () => JsonLowState,
-  config?: () => JsonLowConfig,
+  state?: () => JsonLowState<DownstreamState>,
+  config?: () => JsonLowConfig<DownstreamConfig>,
   end?: () => End,
 }
 export type JsonLowHandler<Feedback> = (codePoint: number) => Feedback
