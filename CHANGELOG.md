@@ -1,6 +1,6 @@
 # 0.3.3
 
-#4 @rafern improved TypeScript support, ability to restore state and configuration.
+[@rafern](https://github.com/rafern) in [#4](https://github.com/xtao-org/jsonhilo/pull/4) improved TypeScript support, ability to restore state and configuration.
 
 # 0.3.2
 
