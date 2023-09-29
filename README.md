@@ -39,13 +39,13 @@ npm i @xtao-org/jsonhilo
 Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.2/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.3/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.2/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.3/mod.js'
 ```
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
@@ -121,7 +121,7 @@ The core module is [**`JsonLow.js`**](JsonLow.js). It has no dependencies, so it
 
 See [**JsonLow.d.ts**](JsonLow.d.ts) for type information and [demo/highlight.js](demo/highlight.js) for usage example.
 
-*Detailed description to be written.*
+<!-- *Detailed description to be written.* -->
 
 ## JsonHigh
 

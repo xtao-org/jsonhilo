@@ -1,3 +1,7 @@
+# 0.3.3
+
+#4 @rafern improved TypeScript support, ability to restore state and configuration.
+
 # 0.3.2
 
 No change in code.
