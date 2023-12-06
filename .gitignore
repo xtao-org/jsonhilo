@@ -3,3 +3,5 @@ todo
 ignored
 node_modules
 *.tgz
+.clj-kondo
+.lsp
