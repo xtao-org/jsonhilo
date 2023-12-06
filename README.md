@@ -16,6 +16,12 @@ Written in [runtime-independent](#runtime-independent) JavaScript.
 
 Works in [Deno](https://deno.land/), [Node.js](https://nodejs.org), and the browser.
 
+## Help and support
+
+[You can get help and support, including direct online assistance, related to JsonHilo.js through Githelp here.](https://githelp.app/repos/jsonhilo)
+
+At the moment this is a limited opportunity to try an early version of Githelp.
+
 ## Status
 
 Stable.
