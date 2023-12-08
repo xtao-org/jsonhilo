@@ -2,7 +2,7 @@
   "type": "module",
   "name": "@xtao-org/jsonhilo",
   "description": "Pure JavaScript minimal lossless JSON parse event streaming, akin to SAX. Fast, modular, and dependency-free.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "main": "mod.js",
   "devDependencies": {},
   "scripts": {
