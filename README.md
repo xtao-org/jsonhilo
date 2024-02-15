@@ -8,6 +8,16 @@
 
 Minimal [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML).
 
+***
+
+Handcrafted by <a href="https://djedr.github.io">Darius J Chuck</a>.
+
+<a href='https://ko-fi.com/djedr' target='_blank'><img style='border:0px;width:120px;' src='https://storage.ko-fi.com/cdn/kofi4.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
+&nbsp;
+<a href="https://buycoffee.to/jevko" target="_blank"><img src="https://buycoffee.to/btn/buycoffeeto-btn-primary.svg" style="width: 120px" alt="Postaw mi kawę na buycoffee.to"></a>
+
+***
+
 [Fast](#fast), [modular](#modular), and dependency-free. 
 
 Provides two interfaces: a [**hi**gh-level](#jsonhigh) one and a [**lo**w-level](#jsonlow) one.
@@ -15,12 +25,6 @@ Provides two interfaces: a [**hi**gh-level](#jsonhigh) one and a [**lo**w-level]
 Written in [runtime-independent](#runtime-independent) JavaScript. 
 
 Works in [Deno](https://deno.land/), [Node.js](https://nodejs.org), and the browser.
-
-## Help and support
-
-[You can get help and support, including direct online assistance, related to JsonHilo.js through Githelp here.](https://githelp.app/repos/jsonhilo)
-
-At the moment this is a limited opportunity to try an early version of Githelp.
 
 ## Status
 
@@ -222,14 +226,34 @@ I decided to release this as a separate library, because I was tinkering with De
 
 ## See also
 
-[JsonStrum](https://github.com/xtao-org/jsonstrum) -- a high-level wrapper over JsonHilo which emits fully parsed objects and arrays. 
+[JsonStrum](https://github.com/xtao-org/jsonstrum) -- a high-level wrapper over JsonHilo which emits fully parsed objects and arrays.
 
-***
+## License
 
 Released under the [MIT](LICENSE) license.
+
+## Support this project
+
+<p>I prefer to share my creations for free. However living and creating without money is not possible for me. So I ask companies and people, who want and can, for support. Every symbolic cup of coffee counts!</p>
+
+<div class="flexi" style="flex-wrap: wrap;">
+  <a href='https://ko-fi.com/djedr' target='_blank'><img width='240' style='border:0px;width:240px;' src='https://storage.ko-fi.com/cdn/kofi4.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
+  &nbsp;
+  <a href="https://buycoffee.to/jevko" target="_blank"><img src="https://buycoffee.to/btn/buycoffeeto-btn-primary.svg" style="width: 240px" alt="Postaw mi kawę na buycoffee.to"></a>
+  &nbsp;
+  <!-- <a href="https://xtao.org/supporters" target="_blank" title="Become a supporter"><img src="../gfx/patronbutton-opt.svg" style="width: 300px" alt="Become a supporter"></a> -->
+</div>
+
+## Paid support and online assistance
+
+If you prefer, [you can get paid help and support, including direct online assistance, related to JsonHilo.js through Githelp.](https://githelp.app/repos/jsonhilo)
+
+At the moment this is a limited opportunity to try an early version of Githelp.
+
+***
 
 <img src="tao-json.png" alt="tao-json-logo" height="128" />
 
 A stand-alone part of the [TAO](https://xtao.org)-JSON project.
 
-© 2023 [xtao.org](https://xtao.org)
+© 2024 [xtao.org](https://xtao.org)
