@@ -12,9 +12,9 @@ Minimal [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://
 
 Handcrafted by <a href="https://djedr.github.io">Darius J Chuck</a>.
 
-<a href='https://ko-fi.com/djedr' target='_blank'><img style='border:0px;width:120px;' src='https://storage.ko-fi.com/cdn/kofi4.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href='https://ko-fi.com/djedr' target='_blank'><img width="120" style='border:0px;width:120px;' src='https://storage.ko-fi.com/cdn/kofi1.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
 &nbsp;
-<a href="https://buycoffee.to/jevko" target="_blank"><img src="https://buycoffee.to/btn/buycoffeeto-btn-primary.svg" style="width: 120px" alt="Postaw mi kawę na buycoffee.to"></a>
+<a href="https://buycoffee.to/jevko" target="_blank"><img width="120" src="https://buycoffee.to/btn/buycoffeeto-btn-primary.svg" style="width: 120px" alt="Postaw mi kawę na buycoffee.to"></a>
 
 ***
 
@@ -237,11 +237,9 @@ Released under the [MIT](LICENSE) license.
 <p>I prefer to share my creations for free. However living and creating without money is not possible for me. So I ask companies and people, who want and can, for support. Every symbolic cup of coffee counts!</p>
 
 <div class="flexi" style="flex-wrap: wrap;">
-  <a href='https://ko-fi.com/djedr' target='_blank'><img width='240' style='border:0px;width:240px;' src='https://storage.ko-fi.com/cdn/kofi4.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
+  <a href='https://ko-fi.com/djedr' target='_blank'><img width='240' style='border:0px;width:240px;' src='https://storage.ko-fi.com/cdn/kofi1.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
   &nbsp;
-  <a href="https://buycoffee.to/jevko" target="_blank"><img src="https://buycoffee.to/btn/buycoffeeto-btn-primary.svg" style="width: 240px" alt="Postaw mi kawę na buycoffee.to"></a>
-  &nbsp;
-  <!-- <a href="https://xtao.org/supporters" target="_blank" title="Become a supporter"><img src="../gfx/patronbutton-opt.svg" style="width: 300px" alt="Become a supporter"></a> -->
+  <a href="https://buycoffee.to/jevko" target="_blank"><img width='240' src="https://buycoffee.to/btn/buycoffeeto-btn-primary.svg" style="width: 240px" alt="Postaw mi kawę na buycoffee.to"></a>
 </div>
 
 ## Paid support and online assistance
