@@ -237,6 +237,10 @@ Released under the [MIT](LICENSE) license.
 <p>I prefer to share my creations for free. However living and creating without money is not possible for me. So I ask companies and people, who want and can, for support. Every symbolic cup of coffee counts!</p>
 
 <div class="flexi" style="flex-wrap: wrap;">
+  <a href="https://donate.stripe.com/00gdUicLv4UueeQcMM" target="_blank"><img src="https://raw.githubusercontent.com/djedr/djedr.github.io/master/gfx/donate-but.svg" style="height: 64px" alt="Donate directly via Stripe" title="Donate directly via Stripe"></a>
+  &nbsp;
+  or
+  &nbsp;
   <a href='https://ko-fi.com/djedr' target='_blank'><img width='240' style='border:0px;width:240px;' src='https://storage.ko-fi.com/cdn/kofi1.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
   &nbsp;
   <a href="https://buycoffee.to/jevko" target="_blank"><img width='240' src="https://buycoffee.to/btn/buycoffeeto-btn-primary.svg" style="width: 240px" alt="Postaw mi kawę na buycoffee.to"></a>
