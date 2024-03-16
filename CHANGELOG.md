@@ -1,3 +1,7 @@
+# 0.3.4-0.3.6
+
+No changes in code. Added means of supporting the project.
+
 # 0.3.3
 
 [@rafern](https://github.com/rafern) in [#4](https://github.com/xtao-org/jsonhilo/pull/4) improved TypeScript support, ability to restore state and configuration.
