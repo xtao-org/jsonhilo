@@ -12,6 +12,10 @@ Minimal [lossless](#lossless) JSON parse event streaming, akin to [SAX](https://
 
 Handcrafted by <a href="https://djedr.github.io">Darius J Chuck</a>.
 
+<a href="https://donate.stripe.com/00gdUicLv4UueeQcMM" target="_blank"><img src="https://raw.githubusercontent.com/djedr/djedr.github.io/master/gfx/donate-but.svg" style="height: 32px" alt="Donate directly via Stripe" title="Donate directly via Stripe"></a>
+&nbsp;
+or
+&nbsp;
 <a href='https://ko-fi.com/djedr' target='_blank'><img width="120" style='border:0px;width:120px;' src='https://storage.ko-fi.com/cdn/kofi1.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
 &nbsp;
 <a href="https://buycoffee.to/jevko" target="_blank"><img width="120" src="https://buycoffee.to/btn/buycoffeeto-btn-primary.svg" style="width: 120px" alt="Postaw mi kawę na buycoffee.to"></a>
