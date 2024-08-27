@@ -36,7 +36,7 @@ Stable.
 
 [Passes standards-compliance tests](#standards-compliant) and [performs well in benchmarks](#fast).
 
-Somewhat battle-tested.
+Battle-tested.
 
 ## Installation
 
