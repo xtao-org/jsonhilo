@@ -52,6 +52,9 @@ export const error = (message) => {
     message,
   }
 }
+export const isError = (value) => {
+  return value !== null && typeof value === 'object' && value.type === JsonFeedbackType.error
+}
 export const unexpected = (code, context, expected) => {
   return {
     type: JsonFeedbackType.error,

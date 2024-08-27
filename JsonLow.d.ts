@@ -59,6 +59,7 @@ export interface JsonUnexpectedEndFeedback {
 export type JsonStandardFeedback = JsonErrorFeedback | JsonUnexpectedFeedback;
 export type JsonStandardEnd = JsonErrorFeedback | JsonUnexpectedEndFeedback;
 export declare const error: (message: string) => JsonErrorFeedback
+export declare const isError: (message: unknown) => boolean
 export declare const unexpected: (code: number, context: string, expected: Array<string | [startChar: string, endChar: string]>) => JsonUnexpectedFeedback
 export declare const unexpectedEnd: (context?: string, expected?: Array<string | [startChar: string, endChar: string]>) => JsonUnexpectedEndFeedback
 export declare const isZeroNine: (code: number) => boolean

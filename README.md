@@ -154,12 +154,6 @@ See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#qu
 * `chunk` which accepts a JSON chunk to parse. It returns the stream object for chaining. 
 * `end` with no arguments which signals that the current JSON document is finished. If there is no error, it calls the corresponding `end` event handler, passing its return value to the caller.
 
-### Error handling
-
-If there is an error when parsing a `chunk`, an exception is thrown.
-
-If there is an error at the `end`, that error is returned to the caller. The user-provided `end` event handler is not called.
-
 ### Events
 
 There are 4 event handlers without arguments which indicate start and end of structures:
@@ -175,6 +169,49 @@ And 2 event handlers with one argument which capture primitives:
 * `value`: a primitive JSON value ended. The argument of the event contains the corresponding JavaScript value: `true`, `false`, `null`, a number, or a string.
 
 Finally, there is the argumentless `end` event handler which is called by the `end` method of the stream to confirm that the parsed JSON document is complete and valid.
+
+Note that an event handler won't be called if there is an error in the parsed JSON, see [error handling](#error-handling). 
+
+### Error handling
+
+If there is an error when parsing a `chunk`, an `Error` is thrown, containing a serialized JSON object with details in the error message.
+
+If there is an error at the `end`, that error is returned to the caller. The user-provided `end` event handler is not called, so it should not contain any [cleanup](#cleanup) code.
+
+### Cleanup
+
+To run cleanup code at the end of parsing a document regardless of whether there was an error or not, **don't put that code in the end handler**. Instead put it after `.end()`, like so:
+
+```js
+// ...
+stream.end()
+cleanup()
+```
+
+If you want to also handle an error, you can use the `isError` helper:
+
+```js
+import {isError} from '@xtao-org/jsonhilo'
+
+// ...
+
+const ret = stream.end()
+if (isError(ret)) { handle(ret) } // handle error
+cleanup()
+```
+
+If your error handler can throw, you can use `try-catch-finally`:
+
+```js
+import {isError} from '@xtao-org/jsonhilo'
+
+// ...
+
+const ret = stream.end()
+try { if (isError(ret)) { handle(ret) } }
+catch (e) { /* optional */ }
+finally { cleanup() }
+```
 
 ## Fast
 
