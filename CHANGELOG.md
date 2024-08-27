@@ -1,3 +1,7 @@
+# 0.3.7
+
+Documented for error handling, added `isError` in [PR #7](https://github.com/xtao-org/jsonhilo/pull/7), addressing [issue #6](https://github.com/xtao-org/jsonhilo/issues/6).
+
 # 0.3.4-0.3.6
 
 No changes in code. Added means of supporting the project.
