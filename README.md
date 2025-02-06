@@ -243,7 +243,7 @@ The major differences that make the comparison of the two problematic are:
 
 By default the parser is streaming-friendly by accepting the following:
 
-* Multiple consecutive top-level JSON values -- it can read [line-delimited JSON and concatenated JSON](https://en.wikipedia.org/wiki/JSON_streaming), e.g. [JSON Lines](https://jsonlines.org/), [ndjson](http://ndjson.org/). Whitespace-separated primitives are also supported.
+* Multiple consecutive top-level JSON values -- it can read [line-delimited JSON and concatenated JSON](https://en.wikipedia.org/wiki/JSON_streaming), e.g. [JSON Lines](https://jsonlines.org/)/JSONL, [NDJSON](https://web.archive.org/web/20231218162511/https://ndjson.org/). Whitespace-separated primitives are also supported.
 
 * [Trailing commas](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Trailing_commas) -- a single trailing comma in an array or an object generates no errors.
 
