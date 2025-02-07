@@ -149,10 +149,13 @@ See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#qu
 
 ### Return value
 
-`JsonHigh` returns a stream object with two methods:
+`JsonHigh` returns a stream object with the following methods:
 
 * `chunk` which accepts a JSON chunk to parse. It returns the stream object for chaining. 
 * `end` with no arguments which signals that the current JSON document is finished. If there is no error, it calls the corresponding `end` event handler, passing its return value to the caller.
+* `depth` which returns current depth (level of nesting). **NOTE**: an `open*` or `close*` handler is always called *after* the depth is updated, meaning:
+  * in `openObject`/`openArray` handlers the lowest depth reported will be 1 -- we entered a top-level object/array and are now at depth 1
+  * in `closeObject`/`closeArray` handlers the lowest depth reported will be 0 -- we exited a top-level object/array and are now at depth 0 (top-level)
 
 ### Events
 
