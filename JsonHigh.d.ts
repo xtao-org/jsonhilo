@@ -4,6 +4,15 @@ export type JsonHigh = <Feedback, End>(
 ) => {
   chunk(chunk: string): Feedback,
   end(): End,
+  /**
+   * Reports current depth (level of nesting).
+   * 
+   * **NOTE**: an `open*` or `close*` handler is always called *after* the depth is updated, meaning:
+   * 
+   * * in `openObject`/`openArray` handlers the lowest depth reported will be 1 -- we entered a top-level object/array and are now at depth 1
+   * 
+   * * in `closeObject`/`closeArray` handlers the lowest depth reported will be 0 -- we exited a top-level object/array and are now at depth 0 (top-level)
+   */
   depth(): number,
   // todo: type for state()
 }

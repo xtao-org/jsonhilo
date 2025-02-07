@@ -1,21 +1,24 @@
-import {JsonLow, JsonHigh} from '../mod.js'
+import {JsonHigh} from '../mod.js'
 
 import test from 'node:test'
-
-// ?todo: test JsonLow
-// todo: figure out ergonomy considering when depth is updated
+import assert from "node:assert"
 
 // test case and functionality requested in https://github.com/xtao-org/jsonhilo/issues/8
 test('get current depth', async () => {
+  let topLevelObjectCount = 0
   const handlers = {
-    openObject() {
-      console.log('openObject', stream.depth())
-    },
     closeObject() {
-      console.log('closeObject', stream.depth())
+      const depth = stream.depth()
+      if (depth === 0) topLevelObjectCount += 1
     }
   }
   const stream = JsonHigh(handlers)
-  stream.chunk('{"0": {"1": {"2": 2}}}')
-  
+  stream.chunk(`
+    { "0": [ { "1": [2] } ] }
+    {}
+    [5, 5, []]
+    { "0": {} }
+  `)
+
+  assert.equal(topLevelObjectCount, 3)
 })
