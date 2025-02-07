@@ -88,6 +88,7 @@ export declare const JsonLow: <Feedback, End, DownstreamState = unknown, Downstr
 ) => {
   codePoint(codePoint: number): Feedback | JsonStandardFeedback | undefined,
   end(): End | JsonStandardEnd | undefined,
+  depth(): number,
   state(): JsonLowState<DownstreamState>,
   config(): JsonLowConfig<DownstreamConfig>,
 }

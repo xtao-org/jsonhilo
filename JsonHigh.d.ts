@@ -4,6 +4,8 @@ export type JsonHigh = <Feedback, End>(
 ) => {
   chunk(chunk: string): Feedback,
   end(): End,
+  depth(): number,
+  // todo: type for state()
 }
 export type JsonHighHandlers<Feedback, End> = {
   openArray?: JsonHighHandler<Feedback>,
