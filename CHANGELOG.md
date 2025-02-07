@@ -1,6 +1,10 @@
+# 0.3.8
+
+Exposed current depth via `JsonLow.depth()` and `JsonHigh.depth()` ([PR #9](https://github.com/xtao-org/jsonhilo/pull/9), [issue #8](https://github.com/xtao-org/jsonhilo/issues/8)).
+
 # 0.3.7
 
-Documented for error handling, added `isError` in [PR #7](https://github.com/xtao-org/jsonhilo/pull/7), addressing [issue #6](https://github.com/xtao-org/jsonhilo/issues/6).
+Documented error handling, added `isError` in [PR #7](https://github.com/xtao-org/jsonhilo/pull/7), addressing [issue #6](https://github.com/xtao-org/jsonhilo/issues/6).
 
 # 0.3.4-0.3.6
 

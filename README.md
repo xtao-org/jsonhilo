@@ -53,13 +53,13 @@ npm i @xtao-org/jsonhilo
 Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.7/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.8/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.7/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.8/mod.js'
 ```
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
@@ -149,10 +149,13 @@ See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#qu
 
 ### Return value
 
-`JsonHigh` returns a stream object with two methods:
+`JsonHigh` returns a stream object with the following methods:
 
 * `chunk` which accepts a JSON chunk to parse. It returns the stream object for chaining. 
 * `end` with no arguments which signals that the current JSON document is finished. If there is no error, it calls the corresponding `end` event handler, passing its return value to the caller.
+* `depth` which returns current depth (level of nesting). **NOTE**: an `open*` or `close*` handler is always called *after* the depth is updated, meaning:
+  * in `openObject`/`openArray` handlers the lowest depth reported will be 1 -- we entered a top-level object/array and are now at depth 1
+  * in `closeObject`/`closeArray` handlers the lowest depth reported will be 0 -- we exited a top-level object/array and are now at depth 0 (top-level)
 
 ### Events
 

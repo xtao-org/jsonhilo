@@ -407,6 +407,9 @@ export const JsonLow = (next, initialState = {}) => {
         default: return unexpectedEnd()
       }
     },
+    depth: () => {
+      return parents.length - 1
+    },
     state: () => {
       const downstream = next.state?.()
       return {mode, parents: [...parents], isKey, hexIndex, downstream}
