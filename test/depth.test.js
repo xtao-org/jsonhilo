@@ -3,7 +3,7 @@ import {JsonHigh} from '../mod.js'
 import test from 'node:test'
 import assert from "node:assert"
 
-// test case and functionality requested in https://github.com/xtao-org/jsonhilo/issues/8
+// test case for functionality requested in https://github.com/xtao-org/jsonhilo/issues/8
 test('get current depth', async () => {
   let topLevelObjectCount = 0
   const handlers = {
