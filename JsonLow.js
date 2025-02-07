@@ -408,7 +408,7 @@ export const JsonLow = (next, initialState = {}) => {
       }
     },
     depth: () => {
-      return parents.length
+      return parents.length - 1
     },
     state: () => {
       const downstream = next.state?.()
