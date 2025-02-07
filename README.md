@@ -306,4 +306,4 @@ At the moment this is a limited opportunity to try an early version of Githelp.
 
 A stand-alone part of the [TAO](https://xtao.org)-JSON project.
 
-© 2025 [xtao.org](https://xtao.org)
+© 2021-2025 [xtao.org](https://xtao.org)
