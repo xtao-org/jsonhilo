@@ -4,6 +4,7 @@ const {_t_, _n_, _b_, _r_, _f_} = CodePoint
 
 // todo: add types for the new handlers
 // todo: should we emit .closeString() along with .value() and .closeKey() along with .key()?
+// todo: should numbers buffer be separately controlled from the string/key buffer?
 export const JsonLowToHigh = (next) => {
   let mode = 'top'
   let stringBuffer = ''
