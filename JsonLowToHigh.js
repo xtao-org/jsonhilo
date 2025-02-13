@@ -2,30 +2,38 @@ import {CodePoint} from './JsonLow.js'
 
 const {_t_, _n_, _b_, _r_, _f_} = CodePoint
 
+// todo: add types for the new handlers
+// todo: should we emit .closeString() along with .value() and .closeKey() along with .key()?
 export const JsonLowToHigh = (next) => {
   let mode = 'top'
   let stringBuffer = ''
+  // todo: could merge stringBuffer and numberBuffer into buffer
   let numberBuffer = ''
   let hexBuf = []
   const feedbackQueue = []
+
+  const maxBufferLength = next.maxBufferLength ?? Infinity
+  const parseNumbers = next.parseNumbers ?? true
 
   const valFeedback = (val) => {
     return feedbackQueue.length > 0? [feedbackQueue.pop(), val]: [val]
   }
 
-  const openStringKey = () => {
-    stringBuffer = ''
-    mode = 'string'
-    return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
-  }
-
   const self = {
-    openString: openStringKey,
-    openKey: openStringKey,
+    openString: () => {
+      stringBuffer = ''
+      mode = 'string'
+      return valFeedback(next.openString?.())
+    },
+    openKey: () => {
+      stringBuffer = ''
+      mode = 'string'
+      return valFeedback(next.openKey?.())
+    },
     openNumber: (codePoint) => {
       numberBuffer = String.fromCharCode(codePoint)
       mode = 'number'
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
+      return valFeedback(next.openNumber?.())
     },
     openObject: () => {
       return valFeedback(next.openObject?.())
@@ -50,22 +58,43 @@ export const JsonLowToHigh = (next) => {
     },
     codePoint: (codePoint) => {
       if (mode === 'string') {
-        stringBuffer += String.fromCodePoint(codePoint)
+        const c = String.fromCodePoint(codePoint)
+        if (stringBuffer.length === maxBufferLength) {
+          const part = stringBuffer
+          stringBuffer = c
+          return valFeedback(next.buffer?.(part))
+        }
+        stringBuffer += c
       } else if (mode === 'escape') {
-        if (codePoint === _n_) stringBuffer += '\n'
-        else if (codePoint === _t_) stringBuffer += '\t'
-        else if (codePoint === _r_) stringBuffer += '\r'
-        else if (codePoint === _b_) stringBuffer += '\b'
-        else if (codePoint === _f_) stringBuffer += '\f'
+        let c
+        if (codePoint === _n_) c = '\n'
+        else if (codePoint === _t_) c = '\t'
+        else if (codePoint === _r_) c = '\r'
+        else if (codePoint === _b_) c = '\b'
+        else if (codePoint === _f_) c = '\f'
         else {
           // " or \\ or /
-          stringBuffer += String.fromCharCode(codePoint)
+          c = String.fromCharCode(codePoint)
         }
         mode = 'string'
+
+        if (stringBuffer.length === maxBufferLength) {
+          const part = stringBuffer
+          stringBuffer = c
+          return valFeedback(next.buffer?.(part))
+        }
+        stringBuffer += c
       } else if (mode === 'hex') {
         hexBuf.push(codePoint)
       } else if (mode === 'number') {
-        numberBuffer += String.fromCharCode(codePoint)
+        const c = String.fromCharCode(codePoint)
+        if (parseNumbers === false && numberBuffer.length === maxBufferLength) {
+          const part = numberBuffer
+          numberBuffer = c
+          // todo: numberPart?
+          return valFeedback(next.buffer?.(part))
+        }
+        numberBuffer += c
       }
       return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
@@ -80,23 +109,61 @@ export const JsonLowToHigh = (next) => {
     },
     closeString: () => {
       mode = 'top'
-      return valFeedback(next.value?.(stringBuffer))
+      if (maxBufferLength === Infinity) {
+        return valFeedback(next.value?.(stringBuffer))
+      } else {
+        const ret = [
+          next.buffer?.(stringBuffer),
+          next.closeString?.(),
+        ]
+        if (feedbackQueue.length > 0) {
+          ret.unshift(feedbackQueue.pop())
+        }
+        return ret
+      }
     },
     closeKey: () => {
       mode = 'top'
-      return valFeedback(next.key?.(stringBuffer))
+      if (maxBufferLength === Infinity) {
+        return valFeedback(next.key?.(stringBuffer))
+      } else {
+        const ret = [
+          next.buffer?.(stringBuffer),
+          next.closeKey?.(),
+        ]
+        if (feedbackQueue.length > 0) {
+          ret.unshift(feedbackQueue.pop())
+        }
+        return ret
+      }
     },
     closeHex: (codePoint) => {
       hexBuf.push(codePoint)
-      stringBuffer += String.fromCharCode(Number.parseInt(String.fromCharCode(...hexBuf), 16))
       mode = 'string'
+
+      const c = String.fromCharCode(Number.parseInt(String.fromCharCode(...hexBuf), 16))
+      if (stringBuffer.length === maxBufferLength) {
+        const part = stringBuffer
+        stringBuffer = c
+        return valFeedback(next.buffer?.(part))
+      }
+      stringBuffer += c
       return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
     closeNumber: () => {
       mode = 'top'
-      feedbackQueue.push(next.value?.(
-        Number.parseFloat(numberBuffer),
-      ))
+      if (parseNumbers) {
+        feedbackQueue.push(next.value?.(
+          Number.parseFloat(numberBuffer),
+        ))
+      } else {
+        feedbackQueue.push(
+          // todo: numberPart?
+          next.buffer?.(numberBuffer),
+          next.closeNumber?.(),
+        )
+      }
+      // todo: return undefined?
       return []
     },
     end: () => {
