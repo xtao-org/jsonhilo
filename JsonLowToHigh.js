@@ -1,74 +1,86 @@
-import {CodePoint} from './JsonLow.js'
+import {CodePoint, error} from './JsonLow.js'
 
 const {_t_, _n_, _b_, _r_, _f_} = CodePoint
 
 // todo: add types for the new handlers
-// todo: should we emit .closeString() along with .value() and .closeKey() along with .key()?
-// todo: should numbers buffer be separately controlled from the string/key buffer?
 export const JsonLowToHigh = (next) => {
+  const {
+    // todo: maybe more specific name?
+    maxBufferLength = Infinity,
+    // todo: naming
+    // todo: document
+    maxNumberLength = 8192,
+    parseNumbers = true,
+  } = next
+
   let mode = 'top'
+  let stringKind = 'string'
   let stringBuffer = ''
-  // todo: could merge stringBuffer and numberBuffer into buffer
+  // note: in codepoints, so counting manually for performance
+  let stringBufferLength = 0
   let numberBuffer = ''
-  let hexBuf = []
-  const feedbackQueue = []
-
-  const maxBufferLength = next.maxBufferLength ?? Infinity
-  const parseNumbers = next.parseNumbers ?? true
-
-  const valFeedback = (val) => {
-    return feedbackQueue.length > 0? [feedbackQueue.pop(), val]: [val]
-  }
+  let hexBuffer = []
 
   const self = {
+    // note: for the closeNumber edge case we store feedback here 
+    //       and check inside JsonHigh
+    closeNumberFeedback: undefined,
     openString: () => {
       stringBuffer = ''
+      stringBufferLength = 0
       mode = 'string'
-      return valFeedback(next.openString?.())
+      stringKind = 'string'
+      return next.openString?.()
     },
     openKey: () => {
       stringBuffer = ''
+      stringBufferLength = 0
       mode = 'string'
-      return valFeedback(next.openKey?.())
+      stringKind = 'key'
+      return next.openKey?.()
     },
     openNumber: (codePoint) => {
       numberBuffer = String.fromCharCode(codePoint)
       mode = 'number'
-      return valFeedback(next.openNumber?.())
+      return next.openNumber?.()
     },
     openObject: () => {
-      return valFeedback(next.openObject?.())
+      return next.openObject?.()
     },
     openArray: () => {
-      return valFeedback(next.openArray?.())
+      return next.openArray?.()
     },
     closeObject: () => {
-      return valFeedback(next.closeObject?.())
+      return next.closeObject?.()
     },
     closeArray: () => {
-      return valFeedback(next.closeArray?.())
+      return next.closeArray?.()
     },
     closeTrue: () => {
-      return valFeedback(next.value?.(true))
+      return next.value?.(true)
     },
     closeFalse: () => {
-      return valFeedback(next.value?.(false))
+      return next.value?.(false)
     },
     closeNull: () => {
-      return valFeedback(next.value?.(null))
+      return next.value?.(null)
     },
     codePoint: (codePoint) => {
       if (mode === 'string') {
         const c = String.fromCodePoint(codePoint)
-        if (stringBuffer.length === maxBufferLength) {
-          const part = stringBuffer
+        if (stringBufferLength === maxBufferLength) {
+          const buf = stringBuffer
           stringBuffer = c
-          return valFeedback(next.buffer?.(part))
+          stringBufferLength = 1
+          return stringKind === 'string'?
+            next.stringBuffer?.(buf):
+            next.keyBuffer?.(buf)
         }
         stringBuffer += c
+        stringBufferLength += 1
       } else if (mode === 'escape') {
         let c
-        if (codePoint === _n_) c = '\n'
+        if      (codePoint === _n_) c = '\n'
         else if (codePoint === _t_) c = '\t'
         else if (codePoint === _r_) c = '\r'
         else if (codePoint === _b_) c = '\b'
@@ -79,99 +91,82 @@ export const JsonLowToHigh = (next) => {
         }
         mode = 'string'
 
-        if (stringBuffer.length === maxBufferLength) {
-          const part = stringBuffer
+        if (stringBufferLength === maxBufferLength) {
+          const buf = stringBuffer
           stringBuffer = c
-          return valFeedback(next.buffer?.(part))
+          stringBufferLength = 1
+          return stringKind === 'string'?
+            next.stringBuffer?.(buf):
+            next.keyBuffer?.(buf)
         }
         stringBuffer += c
+        stringBufferLength += 1
       } else if (mode === 'hex') {
-        hexBuf.push(codePoint)
+        hexBuffer.push(codePoint)
       } else if (mode === 'number') {
-        const c = String.fromCharCode(codePoint)
-        if (parseNumbers === false && numberBuffer.length === maxBufferLength) {
-          const part = numberBuffer
-          numberBuffer = c
-          // todo: numberPart?
-          return valFeedback(next.buffer?.(part))
-        }
-        numberBuffer += c
+        if (numberBuffer.length === maxNumberLength) return error(`Number length over the limit of ${maxNumberLength}! Try increasing the limit.`)
+        numberBuffer += String.fromCharCode(codePoint)
       }
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
     escape: () => {
       mode = 'escape'
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
     openHex: () => {
-      hexBuf = []
+      hexBuffer = []
       mode = 'hex'
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
     closeString: () => {
       mode = 'top'
       if (maxBufferLength === Infinity) {
-        return valFeedback(next.value?.(stringBuffer))
+        return next.value?.(stringBuffer)
       } else {
-        const ret = [
-          next.buffer?.(stringBuffer),
+        // note: wrapping feedbacks in an object to work around PosInfoAdapter
+        return {feedbacks: [
+          next.stringBuffer?.(stringBuffer),
           next.closeString?.(),
-        ]
-        if (feedbackQueue.length > 0) {
-          ret.unshift(feedbackQueue.pop())
-        }
-        return ret
+        ]}
       }
     },
     closeKey: () => {
       mode = 'top'
       if (maxBufferLength === Infinity) {
-        return valFeedback(next.key?.(stringBuffer))
+        return next.key?.(stringBuffer)
       } else {
-        const ret = [
-          next.buffer?.(stringBuffer),
+        // note: wrapping feedbacks in an object to work around PosInfoAdapter
+        return {feedbacks: [
+          next.keyBuffer?.(stringBuffer),
           next.closeKey?.(),
-        ]
-        if (feedbackQueue.length > 0) {
-          ret.unshift(feedbackQueue.pop())
-        }
-        return ret
+        ]}
       }
     },
     closeHex: (codePoint) => {
-      hexBuf.push(codePoint)
+      hexBuffer.push(codePoint)
       mode = 'string'
 
-      const c = String.fromCharCode(Number.parseInt(String.fromCharCode(...hexBuf), 16))
-      if (stringBuffer.length === maxBufferLength) {
-        const part = stringBuffer
+      const c = String.fromCharCode(Number.parseInt(String.fromCharCode(...hexBuffer), 16))
+      if (stringBufferLength === maxBufferLength) {
+        const buf = stringBuffer
         stringBuffer = c
-        return valFeedback(next.buffer?.(part))
+        stringBufferLength = 1
+        return stringKind === 'string'?
+          next.stringBuffer?.(buf):
+          next.keyBuffer?.(buf)
       }
       stringBuffer += c
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
+      stringBufferLength += 1
     },
     closeNumber: () => {
       mode = 'top'
       if (parseNumbers) {
-        feedbackQueue.push(next.value?.(
+        self.closeNumberFeedback = next.value?.(
           Number.parseFloat(numberBuffer),
-        ))
-      } else {
-        feedbackQueue.push(
-          // todo: numberPart?
-          next.buffer?.(numberBuffer),
-          next.closeNumber?.(),
         )
+      } else {
+        self.closeNumberFeedback = next.numberBuffer?.(numberBuffer)
       }
-      // todo: return undefined?
-      return []
     },
     end: () => {
-      const feedback = []
-      if (feedbackQueue.length > 0) feedback.push(feedbackQueue.pop())
-      feedback.push(next.end?.())
-      return feedback
+      return next.end?.()
     },
   }
   return self

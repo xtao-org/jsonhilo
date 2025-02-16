@@ -155,9 +155,9 @@ See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#qu
   * in `openObject`/`openArray` handlers the lowest depth reported will be 1 -- we entered a top-level object/array and are now at depth 1
   * in `closeObject`/`closeArray` handlers the lowest depth reported will be 0 -- we exited a top-level object/array and are now at depth 0 (top-level)
 
-### Events
+### Basic events
 
-There are 4 event handlers without arguments which indicate start and end of structures:
+The basic usage of `JsonHigh` involves 4 event handlers without arguments which indicate start and end of structures:
 
 * `openArray`: an array started (`[`)
 * `closeArray`: an array ended (`]`)
@@ -166,12 +166,42 @@ There are 4 event handlers without arguments which indicate start and end of str
 
 And 2 event handlers with one argument which capture primitives:
 
-* `key`: an object's key ended. The argument of the handler contains the key as a JavaScript string.
-* `value`: a primitive JSON value ended. The argument of the event contains the corresponding JavaScript value: `true`, `false`, `null`, a number, or a string.
+* `key`: an object's key ended. The argument of the handler contains the key as a JavaScript string. 
+  * This event can be suppressed by setting [`maxBufferLength`](#maxBufferLength).
+* `value`: a primitive JSON value ended. The argument of the event contains the corresponding JavaScript value: `true`, `false`, `null`, a number, or a string. 
+  * This event can be suppressed for numbers if [`parseNumbers`](#parseNumbers) is set to `false` and for strings if [`maxBufferLength`](#maxBufferLength) is set.
 
 Finally, there is the argumentless `end` event handler which is called by the `end` method of the stream to confirm that the parsed JSON document is complete and valid.
 
-Note that an event handler won't be called if there is an error in the parsed JSON, see [error handling](#error-handling). 
+Note that an event handler won't be called if there is an error in the parsed JSON, see [error handling](#error-handling).
+
+<!-- ?todo: move non-basic options to a separate doc -->
+### Extra events
+
+These handlers take no arguments.
+
+* `openString` -- a string value started (`"`)
+* `openKey` -- a key started (`"`, in key position)
+
+### Conditional events
+
+These handlers take no arguments.
+
+* `closeString` -- a string value ended (`"`); called instead of the `value` event **when `maxBufferLength` is set**.
+* `closeKey` -- a key ended (`"`); called instead of the `key` event **when `maxBufferLength` is set**.
+
+These handlers receive the buffer that should be consumed:
+
+* `keyBuffer` -- key buffer is ready for consumption; called instead of the `key` event **when `maxBufferLength` is set**; the buffer then contains `maxBufferLength` code points or possibly less if we reached the end of a key.
+* `stringBuffer` -- string buffer is ready for consumption; (for string values) called instead of the `value` event **when `maxBufferLength` is set**; the buffer then contains `maxBufferLength` code points or possibly less if we reached the end of a string value.
+* `numberBuffer` -- number buffer is ready for consumption; (for number values) called instead of the `value` event **when `parseNumbers` is set**; the buffer then contains the unparsed number (represented as a string).
+
+### Options
+
+* <a id="maxBufferLength"></a> `maxBufferLength` -- the maximum length of the key or string buffer, in code points; if not set, it defaults to `Infinity`. If set, the `key` event handler won't be called and (for strings) the `value` event handler won't be called. Instead, the `keyBuffer` and `stringBuffer` handlers will be called as soon as the given number of code points has been collected or when the key/string is finished. In the latter case the number of code points may be smaller than `maxBufferLength` and a `closeKey`/`closeString` handler will be called after the last `*Buffer` event to signal the finish. 
+  * This is useful when dealing with long strings where it's desirable to stream them piece-by-piece, e.g. when working with LLMs (Large Language Models). See [Add support for incomplete key and value strings #10](https://github.com/xtao-org/jsonhilo/issues/10) for more information.
+* <a id="parseNumbers"></a> `parseNumbers` -- controls whether numbers should be parsed (converted to JavaScript `number` type) which is the case by default. If set to `false`, the `value` event handler won't be called for numbers. Instead, the `numberBuffer` handler will be called with the number as a string. 
+  * This is useful when dealing with big numbers which would lose precision when converted to the `number` type.
 
 ### Error handling
 
