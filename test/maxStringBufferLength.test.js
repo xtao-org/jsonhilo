@@ -102,3 +102,12 @@ test('string vs key', async () => {
     "ipsum",
   ])
 })
+
+test('number as a key', () => {
+  const stream = JsonHigh({})
+  assert.throws(() => {
+    stream.chunk(`
+      {1: "value2"}
+    `)
+  })
+})

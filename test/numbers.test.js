@@ -36,16 +36,3 @@ test('hard limit on number length', () => {
     `)
   }, /Number length over the limit of 4!/)
 })
-
-test('???', () => {
-  const handlers = {
-    parseNumbers: false,
-    maxNumberLength: 4,
-  }
-  const stream = JsonHigh(handlers)
-  
-  stream.chunk(`
-    {1: "value2"}
-  `)
-  
-})
