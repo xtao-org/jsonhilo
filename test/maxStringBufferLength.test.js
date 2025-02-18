@@ -5,21 +5,21 @@ import assert, { AssertionError } from "node:assert"
 
 // test cases for functionality requested in https://github.com/xtao-org/jsonhilo/issues/10
 
-test('max buffer length', async () => {
+test('max string buffer length', async () => {
   const called = []
   const handlers = {
-    maxBufferLength: 4,
+    maxStringBufferLength: 4,
     value(v) {
       throw AssertionError(`Unexpected value: ${v}`)
     },
     key(k) {
       throw AssertionError(`Unexpected key: ${k}`)
     },
-    keyBuffer(b) {
-      called.push(['keyBuffer', b])
+    bufferKey(b) {
+      called.push(['bufferKey', b])
     },
-    stringBuffer(b) {
-      called.push(['stringBuffer', b])
+    bufferString(b) {
+      called.push(['bufferString', b])
     },
     openKey() {
       called.push('openKey')
@@ -41,17 +41,17 @@ test('max buffer length', async () => {
 
   assert.deepEqual(called, [
     'openKey',
-    ['keyBuffer', 'theq'],
-    ['keyBuffer', 'uick'],
-    ['keyBuffer', 'brow'],
-    ['keyBuffer', 'nfox'],
+    ['bufferKey', 'theq'],
+    ['bufferKey', 'uick'],
+    ['bufferKey', 'brow'],
+    ['bufferKey', 'nfox'],
     'closeKey',
     'openString',
-    ['stringBuffer', 'jump'],
-    ['stringBuffer', 'sove'],
-    ['stringBuffer', 'rthe'],
-    ['stringBuffer', 'lazy'],
-    ['stringBuffer', 'dog'],
+    ['bufferString', 'jump'],
+    ['bufferString', 'sove'],
+    ['bufferString', 'rthe'],
+    ['bufferString', 'lazy'],
+    ['bufferString', 'dog'],
     'closeString',
   ])
 })
@@ -62,7 +62,7 @@ test('string vs key', async () => {
   const keys = []
   const strs = []
   const handlers = {
-    maxBufferLength: 4,
+    maxStringBufferLength: 4,
     value(v) {
       throw AssertionError(`Unexpected value: ${v}`)
     },
@@ -78,10 +78,10 @@ test('string vs key', async () => {
     closeString() {
       strs.push(str)
     },
-    keyBuffer(b) {
+    bufferKey(b) {
       key += b
     },
-    stringBuffer(b) {
+    bufferString(b) {
       str += b
     },
   }

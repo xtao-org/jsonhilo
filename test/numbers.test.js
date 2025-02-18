@@ -10,7 +10,7 @@ test(`don't parse numbers`, () => {
     value(v) {
       throw AssertionError(`Unexpected value: ${v}`)
     },
-    numberBuffer(v) {
+    bufferNumber(v) {
       called.push(v)
     },
   }
@@ -35,4 +35,17 @@ test('hard limit on number length', () => {
       {"number": 1234454765467585464.32424}
     `)
   }, /Number length over the limit of 4!/)
+})
+
+test('???', () => {
+  const handlers = {
+    parseNumbers: false,
+    maxNumberLength: 4,
+  }
+  const stream = JsonHigh(handlers)
+  
+  stream.chunk(`
+    {1: "value2"}
+  `)
+  
 })

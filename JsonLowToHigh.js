@@ -6,12 +6,15 @@ const {_t_, _n_, _b_, _r_, _f_} = CodePoint
 export const JsonLowToHigh = (next) => {
   const {
     // todo: maybe more specific name?
-    maxBufferLength = Infinity,
+    maxStringBufferLength: maxStringBufferLength = Infinity,
     // todo: naming
     // todo: document
     maxNumberLength = 8192,
     parseNumbers = true,
   } = next
+
+  if (maxStringBufferLength < 1) throw Error(`maxStringBufferLength must be at least 1!`)
+  if (maxNumberLength < 1) throw Error(`maxNumberLength must be at least 1!`)
 
   let mode = 'top'
   let stringKind = 'string'
@@ -68,13 +71,13 @@ export const JsonLowToHigh = (next) => {
     codePoint: (codePoint) => {
       if (mode === 'string') {
         const c = String.fromCodePoint(codePoint)
-        if (stringBufferLength === maxBufferLength) {
+        if (stringBufferLength === maxStringBufferLength) {
           const buf = stringBuffer
           stringBuffer = c
           stringBufferLength = 1
           return stringKind === 'string'?
-            next.stringBuffer?.(buf):
-            next.keyBuffer?.(buf)
+            next.bufferString?.(buf):
+            next.bufferKey?.(buf)
         }
         stringBuffer += c
         stringBufferLength += 1
@@ -91,13 +94,13 @@ export const JsonLowToHigh = (next) => {
         }
         mode = 'string'
 
-        if (stringBufferLength === maxBufferLength) {
+        if (stringBufferLength === maxStringBufferLength) {
           const buf = stringBuffer
           stringBuffer = c
           stringBufferLength = 1
           return stringKind === 'string'?
-            next.stringBuffer?.(buf):
-            next.keyBuffer?.(buf)
+            next.bufferString?.(buf):
+            next.bufferKey?.(buf)
         }
         stringBuffer += c
         stringBufferLength += 1
@@ -117,24 +120,24 @@ export const JsonLowToHigh = (next) => {
     },
     closeString: () => {
       mode = 'top'
-      if (maxBufferLength === Infinity) {
+      if (maxStringBufferLength === Infinity) {
         return next.value?.(stringBuffer)
       } else {
         // note: wrapping feedbacks in an object to work around PosInfoAdapter
         return {feedbacks: [
-          next.stringBuffer?.(stringBuffer),
+          next.bufferString?.(stringBuffer),
           next.closeString?.(),
         ]}
       }
     },
     closeKey: () => {
       mode = 'top'
-      if (maxBufferLength === Infinity) {
+      if (maxStringBufferLength === Infinity) {
         return next.key?.(stringBuffer)
       } else {
         // note: wrapping feedbacks in an object to work around PosInfoAdapter
         return {feedbacks: [
-          next.keyBuffer?.(stringBuffer),
+          next.bufferKey?.(stringBuffer),
           next.closeKey?.(),
         ]}
       }
@@ -144,13 +147,13 @@ export const JsonLowToHigh = (next) => {
       mode = 'string'
 
       const c = String.fromCharCode(Number.parseInt(String.fromCharCode(...hexBuffer), 16))
-      if (stringBufferLength === maxBufferLength) {
+      if (stringBufferLength === maxStringBufferLength) {
         const buf = stringBuffer
         stringBuffer = c
         stringBufferLength = 1
         return stringKind === 'string'?
-          next.stringBuffer?.(buf):
-          next.keyBuffer?.(buf)
+          next.bufferString?.(buf):
+          next.bufferKey?.(buf)
       }
       stringBuffer += c
       stringBufferLength += 1
@@ -162,7 +165,7 @@ export const JsonLowToHigh = (next) => {
           Number.parseFloat(numberBuffer),
         )
       } else {
-        self.closeNumberFeedback = next.numberBuffer?.(numberBuffer)
+        self.closeNumberFeedback = next.bufferNumber?.(numberBuffer)
       }
     },
     end: () => {
