@@ -51,13 +51,13 @@ npm i @xtao-org/jsonhilo
 Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.8/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.4.0/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.8/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.4.0/mod.js'
 ```
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
