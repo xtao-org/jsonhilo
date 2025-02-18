@@ -51,13 +51,13 @@ npm i @xtao-org/jsonhilo
 Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.3.8/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.4.0/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.3.8/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.4.0/mod.js'
 ```
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
@@ -143,41 +143,186 @@ See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#qu
 
 ### Parameters
 
-`JsonHigh` is called with an object which contains named event handlers that are invoked during parsing. All handlers are optional and described [below](#events).
+`JsonHigh` is called with an object which contains named event handlers that are invoked during parsing. All handlers and are optional and described [below](#basic-events).
+
+The object may also contain [options](#options) to change the default behavior, e.g. [turn off number parsing](#parseNumbers) or turn on [buffering of strings piece-by-piece](#maxStringBufferLength).
 
 ### Return value
 
 `JsonHigh` returns a stream object with the following methods:
 
-* `chunk` which accepts a JSON chunk to parse. It returns the stream object for chaining. 
-* `end` with no arguments which signals that the current JSON document is finished. If there is no error, it calls the corresponding `end` event handler, passing its return value to the caller.
-* `depth` which returns current depth (level of nesting). **NOTE**: an `open*` or `close*` handler is always called *after* the depth is updated, meaning:
-  * in `openObject`/`openArray` handlers the lowest depth reported will be 1 -- we entered a top-level object/array and are now at depth 1
-  * in `closeObject`/`closeArray` handlers the lowest depth reported will be 0 -- we exited a top-level object/array and are now at depth 0 (top-level)
+<a id="chunk-stream-method"></a>
 
-### Events
+* #### `chunk(c: string)` 
 
-There are 4 event handlers without arguments which indicate start and end of structures:
+  Accepts a JSON chunk to parse. 
 
-* `openArray`: an array started (`[`)
-* `closeArray`: an array ended (`]`)
-* `openObject`: an object started (`{`)
-* `closeObject`: an object ended (`}`)
+  Returns the stream object for chaining. 
+
+<a id="end-stream-method"></a>
+
+* #### `end()`
+
+  Call it to signal to the stream that the current JSON document is finished.
+  
+  If there is no error, it will then call the corresponding [`end()` event handler](#end-event-handler), and return whatever that returned.
+
+* #### `depth()`
+
+  Returns current depth (level of nesting). 
+  
+  **NOTE**: an `open*` or `close*` handler is always called *after* the depth is updated, meaning:
+
+  * In `openObject`/`openArray` handlers the lowest depth reported will be 1 -- we entered a top-level object/array and are now at depth 1.
+  
+  * In `closeObject`/`closeArray` handlers the lowest depth reported will be 0 -- we exited a top-level object/array and are now at depth 0 (top-level).
+
+### Basic events
+
+The basic usage of `JsonHigh` involves 4 event handlers without arguments which indicate start and end of structures:
+
+* #### `openArray()`
+
+  An array started (`[`).
+
+* #### `closeArray()`
+  
+  An array ended (`]`).
+
+* #### `openObject()`
+
+  An object started (`{`).
+
+* #### `closeObject()`
+
+  An object ended (`}`)
 
 And 2 event handlers with one argument which capture primitives:
 
-* `key`: an object's key ended. The argument of the handler contains the key as a JavaScript string.
-* `value`: a primitive JSON value ended. The argument of the event contains the corresponding JavaScript value: `true`, `false`, `null`, a number, or a string.
+* #### `key(k: string)`
+  
+  An object's key ended. 
+  
+  The argument of the handler contains the key as a JavaScript string. 
+  
+  This event can be suppressed by setting [`maxStringBufferLength`](#maxStringBufferLength).
 
-Finally, there is the argumentless `end` event handler which is called by the `end` method of the stream to confirm that the parsed JSON document is complete and valid.
+* #### `value(v: true | false | null | number | string)`
 
-Note that an event handler won't be called if there is an error in the parsed JSON, see [error handling](#error-handling). 
+  A primitive JSON value ended. 
+  
+  The argument of the event contains the corresponding JavaScript value: `true`, `false`, `null`, a number, or a string. 
+
+  This event can be suppressed for numbers if [`parseNumbers`](#parseNumbers) is set to `false` and for strings if [`maxStringBufferLength`](#maxStringBufferLength) is set.
+
+Finally, there is:
+
+<a id="end-event-handler"></a>
+
+* #### `end()`
+
+  An argumentless event handler which is called by the [`end()` method of the stream](#end-stream-method) to confirm that the parsed JSON document is complete and valid.
+
+Note that an event handler won't be called if there is an error in the parsed JSON, see [error handling](#error-handling).
+
+<!-- ?todo: move non-basic options to a separate doc -->
+### Extra events
+
+These handlers take no arguments.
+
+* #### `openKey()`
+
+  A key started (`"`, in key position).
+
+* #### `openString()`
+
+  A string value started (`"`).
+
+* #### `openNumber()` 
+
+  A number value started.
+
+### Conditional events
+
+The following handlers take no arguments.
+
+* #### `closeKey()`
+
+  A key ended (`"`).
+  
+  Called instead of the `key` event **when `maxStringBufferLength` is set**.
+
+* #### `closeString()`
+
+  A string value ended (`"`).
+  
+  Called instead of the `value` event **when `maxStringBufferLength` is set**.
+
+The following handlers receive the buffer that should be consumed.
+
+* #### `bufferKey(buffer: string)`
+
+  Key buffer is ready for consumption
+  
+  Called instead of the `key` event **when `maxStringBufferLength` is set**.
+  
+  The buffer then contains `maxStringBufferLength` code points or possibly less if we reached the end of a key.
+
+* #### `bufferString(buffer: string)`
+
+  String buffer is ready for consumption.
+  
+  For string values, called instead of the `value` event **when `maxStringBufferLength` is set**.
+  
+  The buffer then contains `maxStringBufferLength` code points or possibly less if we reached the end of a string value.
+
+* #### `bufferNumber(buffer: string)`
+
+  Number buffer is ready for consumption.
+  
+  For number values, called instead of the `value` event **when `parseNumbers` is set**.
+  
+  The buffer then contains the unparsed number (represented as a string).
+
+### Options
+
+<a id="maxStringBufferLength"></a>
+
+* #### `maxStringBufferLength: number = Infinity`
+
+  The maximum length of the key or string buffer, in code points.
+
+  If set, the `key` event handler won't be called and, for strings, the `value` event handler won't be called. 
+
+  Instead, the `bufferKey` and `bufferString` handlers will be called as soon as the given number of code points has been collected or when the key/string is finished. 
+
+  In the latter case the number of code points may be smaller than `maxStringBufferLength` and a `closeKey`/`closeString` handler will be called after the last `*Buffer` event to signal the finish. 
+
+  This is useful when dealing with long strings where it's desirable to stream them piece-by-piece, e.g. when working with LLMs (Large Language Models). 
+
+  See [Add support for incomplete key and value strings #10](https://github.com/xtao-org/jsonhilo/issues/10) for more information.
+
+<a id="parseNumbers"></a>
+
+* #### `parseNumbers: boolean = true`
+
+  Controls whether numbers should be parsed (converted to JavaScript `number` type) which is the case by default.
+
+  If set to `false`, the `value` event handler won't be called for numbers. Instead, the `bufferNumber` handler will be called with the number as a string.
+
+  This is useful when dealing with big numbers which would lose precision when converted to the `number` type.
+
+<a id="maxNumberLength"></a>
+
+* #### `maxNumberLength: number = 8192`
+
+  Specifies the maximum length of a number value (in characters).
 
 ### Error handling
 
-If there is an error when parsing a `chunk`, an `Error` is thrown, containing a serialized JSON object with details in the error message.
+If there is an error when [parsing a `chunk()`](#chunk-stream-method), an `Error` is thrown, containing a serialized JSON object with details such as the error message.
 
-If there is an error at the `end`, that error is returned to the caller. The user-provided `end` event handler is not called, so it should not contain any [cleanup](#cleanup) code.
+If there is an error [at the `end()`](#end-stream-method), that error is returned to the caller. The user-provided [`end()` event handler](#end-event-handler) is not called, so it should not contain any [cleanup](#cleanup) code.
 
 ### Cleanup
 

@@ -1,8 +1,21 @@
-# 0.3.8
+# v0.4.0 / 2025-02-18 / An LLM and big number friendly release
+
+* **BREAKING** (slightly): `PosInfoAdapter` (and so `JsonHigh`) now report lines and colums starting from 1 (as is tradition) instead of 0
+
+Issues/PRs:
+
+* Issue [#10](https://github.com/xtao-org/jsonhilo/issues/10) / PR [#11](https://github.com/xtao-org/jsonhilo/pull/11) -- support incomplete strings in `JsonHigh`
+  * Added the `maxStringBufferLength` option and associated `bufferKey`, `bufferString`, `closeKey`, and `closeString` events
+  * Exposed `openKey`, `openString`, and `openNumber` events
+  * Added the `parseNumbers` and `maxNumberLength` options to support numbers of arbitrary precision
+* Improved docs, added some docstrings to `JsonHigh`
+* Simplified error handling in `JsonHigh`
+
+# v0.3.8 / 2025-02-07 / A deep release
 
 Exposed current depth via `JsonLow.depth()` and `JsonHigh.depth()` ([PR #9](https://github.com/xtao-org/jsonhilo/pull/9), [issue #8](https://github.com/xtao-org/jsonhilo/issues/8)).
 
-# 0.3.7
+# v0.3.7 / 2024-08-27 / An error-handling release
 
 Documented error handling, added `isError` in [PR #7](https://github.com/xtao-org/jsonhilo/pull/7), addressing [issue #6](https://github.com/xtao-org/jsonhilo/issues/6).
 

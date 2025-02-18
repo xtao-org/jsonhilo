@@ -1,6 +1,6 @@
 const _newline_ = '\n'.charCodeAt(0)
 export const PosInfoAdapter = (stream) => {
-  let pos = 0, line = 0, col = 0
+  let pos = 0, line = 1, col = 1
   
   const self = {
     codePoint: (code) => {
@@ -15,7 +15,7 @@ export const PosInfoAdapter = (stream) => {
       pos += 1
       if (code === _newline_) {
         line += 1
-        col = 0
+        col = 1
       } else {
         col += 1
       }

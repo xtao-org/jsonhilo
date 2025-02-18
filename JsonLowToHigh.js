@@ -1,109 +1,175 @@
-import {CodePoint} from './JsonLow.js'
+import {CodePoint, error} from './JsonLow.js'
 
 const {_t_, _n_, _b_, _r_, _f_} = CodePoint
 
+/**
+ * 
+ * @param {import('./JsonHigh.js').JsonHighHandlers<Feedback, End>} next
+ */
 export const JsonLowToHigh = (next) => {
+  const {
+    maxStringBufferLength = Infinity,
+    maxNumberLength = 8192,
+    parseNumbers = true,
+  } = next
+
+  if (maxStringBufferLength < 1) throw Error(`maxStringBufferLength must be at least 1!`)
+  if (maxNumberLength < 1) throw Error(`maxNumberLength must be at least 1!`)
+
   let mode = 'top'
+  let stringKind = 'string'
   let stringBuffer = ''
+  // note: in codepoints, so counting manually for performance
+  let stringBufferLength = 0
   let numberBuffer = ''
-  let hexBuf = []
-  const feedbackQueue = []
-
-  const valFeedback = (val) => {
-    return feedbackQueue.length > 0? [feedbackQueue.pop(), val]: [val]
-  }
-
-  const openStringKey = () => {
-    stringBuffer = ''
-    mode = 'string'
-    return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
-  }
+  let hexBuffer = []
 
   const self = {
-    openString: openStringKey,
-    openKey: openStringKey,
+    // note: for the closeNumber edge case we store feedback here 
+    //       and check inside JsonHigh
+    closeNumberFeedback: undefined,
+    openString: () => {
+      stringBuffer = ''
+      stringBufferLength = 0
+      mode = 'string'
+      stringKind = 'string'
+      return next.openString?.()
+    },
+    openKey: () => {
+      stringBuffer = ''
+      stringBufferLength = 0
+      mode = 'string'
+      stringKind = 'key'
+      return next.openKey?.()
+    },
     openNumber: (codePoint) => {
       numberBuffer = String.fromCharCode(codePoint)
       mode = 'number'
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
+      return next.openNumber?.()
     },
     openObject: () => {
-      return valFeedback(next.openObject?.())
+      return next.openObject?.()
     },
     openArray: () => {
-      return valFeedback(next.openArray?.())
+      return next.openArray?.()
     },
     closeObject: () => {
-      return valFeedback(next.closeObject?.())
+      return next.closeObject?.()
     },
     closeArray: () => {
-      return valFeedback(next.closeArray?.())
+      return next.closeArray?.()
     },
     closeTrue: () => {
-      return valFeedback(next.value?.(true))
+      return next.value?.(true)
     },
     closeFalse: () => {
-      return valFeedback(next.value?.(false))
+      return next.value?.(false)
     },
     closeNull: () => {
-      return valFeedback(next.value?.(null))
+      return next.value?.(null)
     },
     codePoint: (codePoint) => {
       if (mode === 'string') {
-        stringBuffer += String.fromCodePoint(codePoint)
+        const c = String.fromCodePoint(codePoint)
+        if (stringBufferLength === maxStringBufferLength) {
+          const buf = stringBuffer
+          stringBuffer = c
+          stringBufferLength = 1
+          return stringKind === 'string'?
+            next.bufferString?.(buf):
+            next.bufferKey?.(buf)
+        }
+        stringBuffer += c
+        stringBufferLength += 1
       } else if (mode === 'escape') {
-        if (codePoint === _n_) stringBuffer += '\n'
-        else if (codePoint === _t_) stringBuffer += '\t'
-        else if (codePoint === _r_) stringBuffer += '\r'
-        else if (codePoint === _b_) stringBuffer += '\b'
-        else if (codePoint === _f_) stringBuffer += '\f'
+        let c
+        if      (codePoint === _n_) c = '\n'
+        else if (codePoint === _t_) c = '\t'
+        else if (codePoint === _r_) c = '\r'
+        else if (codePoint === _b_) c = '\b'
+        else if (codePoint === _f_) c = '\f'
         else {
           // " or \\ or /
-          stringBuffer += String.fromCharCode(codePoint)
+          c = String.fromCharCode(codePoint)
         }
         mode = 'string'
+
+        if (stringBufferLength === maxStringBufferLength) {
+          const buf = stringBuffer
+          stringBuffer = c
+          stringBufferLength = 1
+          return stringKind === 'string'?
+            next.bufferString?.(buf):
+            next.bufferKey?.(buf)
+        }
+        stringBuffer += c
+        stringBufferLength += 1
       } else if (mode === 'hex') {
-        hexBuf.push(codePoint)
+        hexBuffer.push(codePoint)
       } else if (mode === 'number') {
+        if (numberBuffer.length === maxNumberLength) return error(`Number length over the limit of ${maxNumberLength}! Try increasing the limit.`)
         numberBuffer += String.fromCharCode(codePoint)
       }
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
     escape: () => {
       mode = 'escape'
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
     openHex: () => {
-      hexBuf = []
+      hexBuffer = []
       mode = 'hex'
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
     },
     closeString: () => {
       mode = 'top'
-      return valFeedback(next.value?.(stringBuffer))
+      if (maxStringBufferLength === Infinity) {
+        return next.value?.(stringBuffer)
+      } else {
+        // note: wrapping feedbacks in an object to work around PosInfoAdapter
+        return {feedbacks: [
+          next.bufferString?.(stringBuffer),
+          next.closeString?.(),
+        ]}
+      }
     },
     closeKey: () => {
       mode = 'top'
-      return valFeedback(next.key?.(stringBuffer))
+      if (maxStringBufferLength === Infinity) {
+        return next.key?.(stringBuffer)
+      } else {
+        // note: wrapping feedbacks in an object to work around PosInfoAdapter
+        return {feedbacks: [
+          next.bufferKey?.(stringBuffer),
+          next.closeKey?.(),
+        ]}
+      }
     },
     closeHex: (codePoint) => {
-      hexBuf.push(codePoint)
-      stringBuffer += String.fromCharCode(Number.parseInt(String.fromCharCode(...hexBuf), 16))
+      hexBuffer.push(codePoint)
       mode = 'string'
-      return feedbackQueue.length > 0? [feedbackQueue.pop()]: []
+
+      const c = String.fromCharCode(Number.parseInt(String.fromCharCode(...hexBuffer), 16))
+      if (stringBufferLength === maxStringBufferLength) {
+        const buf = stringBuffer
+        stringBuffer = c
+        stringBufferLength = 1
+        return stringKind === 'string'?
+          next.bufferString?.(buf):
+          next.bufferKey?.(buf)
+      }
+      stringBuffer += c
+      stringBufferLength += 1
     },
     closeNumber: () => {
       mode = 'top'
-      feedbackQueue.push(next.value?.(
-        Number.parseFloat(numberBuffer),
-      ))
-      return []
+      if (parseNumbers) {
+        self.closeNumberFeedback = next.value?.(
+          Number.parseFloat(numberBuffer),
+        )
+      } else {
+        self.closeNumberFeedback = next.bufferNumber?.(numberBuffer)
+      }
     },
     end: () => {
-      const feedback = []
-      if (feedbackQueue.length > 0) feedback.push(feedbackQueue.pop())
-      feedback.push(next.end?.())
-      return feedback
+      return next.end?.()
     },
   }
   return self
