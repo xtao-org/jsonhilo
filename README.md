@@ -141,9 +141,6 @@ See [**JsonLow.d.ts**](JsonLow.d.ts) for type information and [demo/highlight.js
 
 See [**JsonHigh.d.ts**](JsonHigh.d.ts) for type information and [Quickstart](#quickstart) for usage example.
 
-<details>
-<summary>JsonHigh documentation</summary>
-
 ### Parameters
 
 `JsonHigh` is called with an object which contains named event handlers that are invoked during parsing. All handlers and are optional and described [below](#basic-events).
@@ -361,8 +358,6 @@ try { if (isError(ret)) { handle(ret) } }
 catch (e) { /* optional */ }
 finally { cleanup() }
 ```
-
-</details>
 
 ## Fast
 

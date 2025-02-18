@@ -2,13 +2,13 @@ import {CodePoint, error} from './JsonLow.js'
 
 const {_t_, _n_, _b_, _r_, _f_} = CodePoint
 
-// todo: add types for the new handlers
+/**
+ * 
+ * @param {import('./JsonHigh.js').JsonHighHandlers<Feedback, End>} next
+ */
 export const JsonLowToHigh = (next) => {
   const {
-    // todo: maybe more specific name?
-    maxStringBufferLength: maxStringBufferLength = Infinity,
-    // todo: naming
-    // todo: document
+    maxStringBufferLength = Infinity,
     maxNumberLength = 8192,
     parseNumbers = true,
   } = next

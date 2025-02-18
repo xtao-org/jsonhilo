@@ -2,6 +2,10 @@ import {JsonLowToHigh} from './JsonLowToHigh.js'
 import {JsonLow, JsonFeedbackType} from './JsonLow.js'
 import {PosInfoAdapter} from './PosInfoAdapter.js'
 
+/**
+ * 
+ * @param {import('./JsonHigh.js').JsonHighHandlers<Feedback, End>} next
+ */
 export const JsonHigh = (next) => {
   const jsonLowToHighStream = JsonLowToHigh(next)
   const stream = PosInfoAdapter(JsonLow(jsonLowToHighStream))

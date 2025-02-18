@@ -61,6 +61,9 @@ test('string vs key', async () => {
   let str = ''
   const keys = []
   const strs = []
+  /**
+   * @type {import('../JsonHigh.js').JsonHighHandlers<Feedback, End>}
+   */
   const handlers = {
     maxStringBufferLength: 4,
     value(v) {
