@@ -1,3 +1,7 @@
+# v0.4.1 / 2025-02-19 / A make options optional release
+
+Fixed the newly added options in JsonHigh.d.ts -- marked as optional.
+
 # v0.4.0 / 2025-02-18 / An LLM and big number friendly release
 
 * **BREAKING** (slightly): `PosInfoAdapter` (and so `JsonHigh`) now report lines and colums starting from 1 (as is tradition) instead of 0

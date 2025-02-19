@@ -38,7 +38,7 @@ export type JsonHighHandlers<Feedback, End> = {
    * See [Add support for incomplete key and value strings #10](https://github.com/xtao-org/jsonhilo/issues/10) for more information.
    * 
    */
-  maxStringBufferLength: number,
+  maxStringBufferLength?: number,
 
   /**
    * @defaultValue `8192`
@@ -46,7 +46,7 @@ export type JsonHighHandlers<Feedback, End> = {
    * Specifies the maximum length of a number value (in characters).
    * 
    */
-  maxNumberLength: number,
+  maxNumberLength?: number,
 
   /**
    * @defaultValue `true`
@@ -58,7 +58,7 @@ export type JsonHighHandlers<Feedback, End> = {
    * This is useful when dealing with big numbers which would lose precision when converted to the `number` type.
    * 
    */
-  parseNumbers: boolean,
+  parseNumbers?: boolean,
 
   /**
    * ### Basic events

@@ -47,6 +47,9 @@
     "ultra-fast",
     "deno",
     "runtime-independent",
-    "jsonhilo"
+    "jsonhilo",
+    "large-language-models",
+    "llm",
+    "big-numbers"
   ]
 }
