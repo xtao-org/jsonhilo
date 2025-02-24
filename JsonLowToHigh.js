@@ -11,10 +11,14 @@ export const JsonLowToHigh = (next) => {
     maxStringBufferLength = Infinity,
     maxNumberLength = 8192,
     parseNumbers = true,
+    bufferOnChunk = false,
   } = next
 
   if (maxStringBufferLength < 1) throw Error(`maxStringBufferLength must be at least 1!`)
   if (maxNumberLength < 1) throw Error(`maxNumberLength must be at least 1!`)
+
+  // todo: have a generic flag `isStringBufferingOn = maxStringBufferLength !== Infinity || flushStringBufferOnChunk` and use it here and elsewhere === Infinity is used
+  const bufferingEnabled = bufferOnChunk || maxStringBufferLength < Infinity
 
   let mode = 'top'
   let stringKind = 'string'
@@ -27,7 +31,17 @@ export const JsonLowToHigh = (next) => {
   const self = {
     // note: for the closeNumber edge case we store feedback here 
     //       and check inside JsonHigh
-    closeNumberFeedback: undefined,
+    _closeNumberFeedback: undefined,
+    _flushStringBuffer: () => {
+      if (bufferOnChunk && stringBufferLength > 0) {
+        const buf = stringBuffer
+        stringBuffer = ''
+        stringBufferLength = 0
+        return stringKind === 'string'?
+          next.bufferString?.(buf):
+          next.bufferKey?.(buf)
+      }
+    },
     openString: () => {
       stringBuffer = ''
       stringBufferLength = 0
@@ -120,9 +134,11 @@ export const JsonLowToHigh = (next) => {
     },
     closeString: () => {
       mode = 'top'
-      if (maxStringBufferLength === Infinity) {
+      if (bufferingEnabled == false) {
         return next.value?.(stringBuffer)
       } else {
+        // note: to prevent double-flushing
+        stringBufferLength = 0
         // note: wrapping feedbacks in an object to work around PosInfoAdapter
         return {feedbacks: [
           next.bufferString?.(stringBuffer),
@@ -132,9 +148,11 @@ export const JsonLowToHigh = (next) => {
     },
     closeKey: () => {
       mode = 'top'
-      if (maxStringBufferLength === Infinity) {
+      if (bufferingEnabled === false) {
         return next.key?.(stringBuffer)
       } else {
+        // note: to prevent double-flushing
+        stringBufferLength = 0
         // note: wrapping feedbacks in an object to work around PosInfoAdapter
         return {feedbacks: [
           next.bufferKey?.(stringBuffer),
@@ -146,6 +164,7 @@ export const JsonLowToHigh = (next) => {
       hexBuffer.push(codePoint)
       mode = 'string'
 
+      // note: this is correct code-unit-wise; fromCharCode operates on code units
       const c = String.fromCharCode(Number.parseInt(String.fromCharCode(...hexBuffer), 16))
       if (stringBufferLength === maxStringBufferLength) {
         const buf = stringBuffer
@@ -161,11 +180,11 @@ export const JsonLowToHigh = (next) => {
     closeNumber: () => {
       mode = 'top'
       if (parseNumbers) {
-        self.closeNumberFeedback = next.value?.(
+        self._closeNumberFeedback = next.value?.(
           Number.parseFloat(numberBuffer),
         )
       } else {
-        self.closeNumberFeedback = next.bufferNumber?.(numberBuffer)
+        self._closeNumberFeedback = next.bufferNumber?.(numberBuffer)
       }
     },
     end: () => {
