@@ -1,0 +1,1 @@
+deno doc --private --html --lint JsonHigh.d.ts
