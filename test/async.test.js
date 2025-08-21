@@ -24,32 +24,24 @@ test('async generator with buffering on chunk', async function() {
   const actual = []
   for await (const chunk of AsyncJsonHighGenerator(
     chunkGenerator, 
-    { bufferOnChunk: true, subscriptions: ['bufferKey', 'closeKey'] },
+    { bufferOnChunk: true, tokenTypes: ['bufferString', 'closeString'] },
   )) {
     actual.push(chunk)
   }
   assert.deepStrictEqual(actual, [
     {
-      buffer: 'coun',
-      type: 'bufferKey'
+      buffer: 'Japan',
+      type: 'bufferString'
+    },
+    { type: 'closeString' },
+    {
+      buffer: 'Tok',
+      type: 'bufferString'
     },
     {
-      buffer: 'try',
-      type: 'bufferKey'
+      buffer: 'yo',
+      type: 'bufferString'
     },
-    {
-      type: 'closeKey'
-    },
-    {
-      buffer: 'cap',
-      type: 'bufferKey'
-    },
-    {
-      buffer: 'ital',
-      type: 'bufferKey'
-    },
-    {
-      type: 'closeKey'
-    }
+    { type: 'closeString' },
   ])
 })
