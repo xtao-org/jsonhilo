@@ -12,47 +12,58 @@ const openNumberToken = Object.freeze({ type: 'openNumber' });
 const closeKeyToken = Object.freeze({ type: 'closeKey' });
 const closeStringToken = Object.freeze({ type: 'closeString' });
 const endToken = Object.freeze({ type: 'end' });
-const allSubscriptions = ["openArray", "closeArray", "openObject", "closeObject", "openKey", "openString", "openNumber", "closeKey", "closeString", "bufferKey", "bufferString", "bufferNumber", "key", "value", "end"];
-export const AsyncJsonHighGenerator = (chunks, 
-// todo: maybe subscriptions should be called subscribeTo or events or sth
-options = {}) => {
+// note: these are constant, so can reuse to avoid garbage as well
+const trueToken = Object.freeze({ type: 'value', value: true });
+const falseToken = Object.freeze({ type: 'value', value: false });
+const nullToken = Object.freeze({ type: 'value', value: null });
+const allTokenTypes = ["openArray", "closeArray", "openObject", "closeObject", "openKey", "openString", "openNumber", "closeKey", "closeString", "bufferKey", "bufferString", "bufferNumber", "key", "value", "end"];
+export const AsyncJsonHighGenerator = (chunks, options = {}) => {
     const q = [];
-    const { subscriptions = allSubscriptions, ...rest } = options;
-    const ss = new Set(subscriptions);
+    const { tokenTypes = allTokenTypes, ...rest } = options;
+    const ts = new Set(tokenTypes);
     const hs = { ...rest };
-    if (ss.has('openArray'))
+    if (ts.has('openArray'))
         hs.openArray = () => q.push(openArrayToken);
-    if (ss.has('closeArray'))
+    if (ts.has('closeArray'))
         hs.closeArray = () => q.push(closeArrayToken);
-    if (ss.has('openObject'))
+    if (ts.has('openObject'))
         hs.openObject = () => q.push(openObjectToken);
-    if (ss.has('closeObject'))
+    if (ts.has('closeObject'))
         hs.closeObject = () => q.push(closeObjectToken);
-    if (ss.has('openKey'))
+    if (ts.has('openKey'))
         hs.openKey = () => q.push(openKeyToken);
-    if (ss.has('openString'))
+    if (ts.has('openString'))
         hs.openString = () => q.push(openStringToken);
-    if (ss.has('openNumber'))
+    if (ts.has('openNumber'))
         hs.openNumber = () => q.push(openNumberToken);
-    if (ss.has('closeKey'))
+    if (ts.has('closeKey'))
         hs.closeKey = () => q.push(closeKeyToken);
-    if (ss.has('closeString'))
+    if (ts.has('closeString'))
         hs.closeString = () => q.push(closeStringToken);
-    if (ss.has('end'))
+    if (ts.has('end'))
         hs.end = () => q.push(endToken);
-    if (ss.has('key'))
+    if (ts.has('key'))
         hs.key = (key) => q.push({ type: 'key', key });
-    if (ss.has('value'))
-        hs.value = (value) => q.push({ type: 'value', value });
-    if (ss.has('bufferKey'))
+    if (ts.has('value'))
+        hs.value = (value) => {
+            if (value === true)
+                q.push(trueToken);
+            else if (value === false)
+                q.push(falseToken);
+            else if (value === null)
+                q.push(nullToken);
+            else
+                q.push({ type: 'value', value });
+        };
+    if (ts.has('bufferKey'))
         hs.bufferKey = (buffer) => {
             q.push({ type: 'bufferKey', buffer });
         };
-    if (ss.has('bufferString'))
+    if (ts.has('bufferString'))
         hs.bufferString = (buffer) => {
             q.push({ type: 'bufferString', buffer });
         };
-    if (ss.has('bufferNumber'))
+    if (ts.has('bufferNumber'))
         hs.bufferNumber = (buffer) => {
             q.push({ type: 'bufferNumber', buffer });
         };

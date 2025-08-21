@@ -1,0 +1,1 @@
+npx tsc AsyncJsonHighGenerator.ts -m nodenext -t es2022
