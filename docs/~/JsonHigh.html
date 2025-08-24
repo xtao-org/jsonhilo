@@ -79,9 +79,8 @@
 </svg>
 </a>
 </div><div><div class="space-y-7" id=""><div class="markdown"><p>This is the high-level interface over JsonLow optimized for convenience. It provides similar functionality and granularity to other streaming parsers, such as <a href="https://github.com/dscape/clarinet">Clarinet</a> or <a href="https://github.com/creationix/jsonparse">creationix/jsonparse</a>.</p>
-</div><section class="section" id="definition">
-  <div>
-	  <h2 class="anchorable mb-1"><a href="#definition" class="anchor" aria-label="Anchor" tabIndex="-1"><svg
+</div><section class="section"  id="definition"><div>
+      <h2 class="anchorable mb-1"><a href="#definition" class="anchor" aria-label="Anchor" tabIndex="-1"><svg
   width="16"
   height="16"
   viewBox="0 0 14 14"
@@ -106,7 +105,7 @@
 Definition</h2></div><div class="space-y-8"><div class=" docEntry" id="typeAlias_JsonHigh">
 
   <div class="docEntryHeader">
-    <div><code><span class="font-medium text-stone-500"><span>&lt;<div class="ml-indent"><div><span><span>Feedback</span></span>,</div><div><span><span>End</span></span>,</div></div>&gt;</span>(<span><span>next<span>: <a href="../././~/JsonHighHandlers.html" class="link">JsonHighHandlers</a>&lt;<span>Feedback</span><span>, </span><span>End</span>&gt;</span></span></span>) =&gt; <a href="../././~/JsonHighStream.html" class="link">JsonHighStream</a>&lt;<span>Feedback</span><span>, </span><span>End</span>&gt;</span>
+    <div><code><span class="font-medium text-stone-500"><span>&lt;<div class="ml-indent"><div><span><span>Feedback</span></span>,</div><div><span><span>End</span></span>,</div></div>&gt;</span>(<span><span>next<span>: <a href="../././~/JsonHighHandlers.html" class="link">JsonHighHandlers</a>&lt;<span>Feedback</span><span>, </span><span>End</span>&gt;</span></span></span>) =&gt; <a href="../././~/JsonHighStream.html" class="link">JsonHighStream</a>&lt;<span>End</span>&gt;</span>
       </code>
     </div><a
   class="context_button relative mr-2"
@@ -169,9 +168,8 @@ Definition</h2></div><div class="space-y-8"><div class=" docEntry" id="typeAlias
 </a>
 </div><div><div class="space-y-7" id=""><div class="markdown"><p><code>JsonHigh</code> is called with an object which contains named event handlers that are invoked during parsing.</p>
 <p>The object may also contain <a href="#options">options</a> to change the default behavior, e.g. <a href="#parseNumbers">turn off number parsing</a> or turn on <a href="#maxStringBufferLength">buffering of strings piece-by-piece</a>.</p>
-</div><section class="section" id="type">
-  <div>
-	  <h2 class="anchorable mb-1"><a href="#type" class="anchor" aria-label="Anchor" tabIndex="-1"><svg
+</div><section class="section"  id="type"><div>
+      <h2 class="anchorable mb-1"><a href="#type" class="anchor" aria-label="Anchor" tabIndex="-1"><svg
   width="16"
   height="16"
   viewBox="0 0 14 14"
