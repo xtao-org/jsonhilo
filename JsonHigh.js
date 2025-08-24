@@ -44,7 +44,11 @@ export const JsonHigh = (next) => {
       return self
     },
     end() {
-      return stream.end()
+      const feedback = stream.end()
+      if (feedback !== undefined && feedback.type === JsonFeedbackType.error) {
+        throw Error(JSON.stringify(feedback, null, 2))
+      }
+      return feedback
     },
     depth() {
       return stream.depth()

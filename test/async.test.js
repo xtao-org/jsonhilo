@@ -45,3 +45,28 @@ test('async generator with buffering on chunk', async function() {
     { type: 'closeString' },
   ])
 })
+
+test('async generator error', async function() {
+  const chunks = [
+    `{`,
+    `"coun`,
+    `try":`,
+    `"Japan",`,
+    `"cap`,
+    `ital"`,
+    `:`,
+    `"Tok`,
+    // note: forgotten closing "
+    `yo`,
+    `}`,
+  ]
+
+  await assert.rejects(async () => {
+    for await (const chunk of AsyncJsonHighGenerator(
+      chunks, 
+      { bufferOnChunk: true, tokenTypes: [] },
+    )) {
+      // do nothing
+    }
+  }, /.*an object left unclosed!.*/)
+})

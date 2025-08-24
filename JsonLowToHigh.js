@@ -17,7 +17,6 @@ export const JsonLowToHigh = (next) => {
   if (maxStringBufferLength < 1) throw Error(`maxStringBufferLength must be at least 1!`)
   if (maxNumberLength < 1) throw Error(`maxNumberLength must be at least 1!`)
 
-  // todo: have a generic flag `isStringBufferingOn = maxStringBufferLength !== Infinity || flushStringBufferOnChunk` and use it here and elsewhere === Infinity is used
   const bufferingEnabled = bufferOnChunk || maxStringBufferLength < Infinity
 
   let mode = 'top'
@@ -188,6 +187,10 @@ export const JsonLowToHigh = (next) => {
       }
     },
     end: () => {
+      // avoid memory leaks
+      stringBuffer = ''
+      stringBufferLength = 0
+      numberBuffer = ''
       return next.end?.()
     },
   }

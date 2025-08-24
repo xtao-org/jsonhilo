@@ -16,34 +16,43 @@ const endToken = Object.freeze({ type: 'end' });
 const trueToken = Object.freeze({ type: 'value', value: true });
 const falseToken = Object.freeze({ type: 'value', value: false });
 const nullToken = Object.freeze({ type: 'value', value: null });
-const allTokenTypes = ["openArray", "closeArray", "openObject", "closeObject", "openKey", "openString", "openNumber", "closeKey", "closeString", "bufferKey", "bufferString", "bufferNumber", "key", "value", "end"];
+const allTokenTypes = [
+    "openArray", "closeArray", "openObject", "closeObject", "openKey",
+    "openString", "openNumber", "closeKey", "closeString", "bufferKey",
+    "bufferString", "bufferNumber", "key", "value", "end"
+];
+/**
+ *
+ * @param chunks we accept {@link Iterable}s here because we can, but using them is not recommended -- they are effectively converted to async, so there is a performance hit; however as of 2025-08-24 we have no sync version of this interface (@todo), so the only substitute is to use the event-based interface of {@link JsonHigh} directly.
+ */
 export const AsyncJsonHighGenerator = (chunks, options = {}) => {
     const q = [];
-    const { tokenTypes = allTokenTypes, ...rest } = options;
+    const { tokenTypes = allTokenTypes, ...restOptions } = options;
     const ts = new Set(tokenTypes);
-    const hs = { ...rest };
+    // todo: tidy up those type definitions; alias JsonHighHanlders
+    const hs = restOptions;
     if (ts.has('openArray'))
-        hs.openArray = () => q.push(openArrayToken);
+        hs.openArray = () => { q.push(openArrayToken); };
     if (ts.has('closeArray'))
-        hs.closeArray = () => q.push(closeArrayToken);
+        hs.closeArray = () => { q.push(closeArrayToken); };
     if (ts.has('openObject'))
-        hs.openObject = () => q.push(openObjectToken);
+        hs.openObject = () => { q.push(openObjectToken); };
     if (ts.has('closeObject'))
-        hs.closeObject = () => q.push(closeObjectToken);
+        hs.closeObject = () => { q.push(closeObjectToken); };
     if (ts.has('openKey'))
-        hs.openKey = () => q.push(openKeyToken);
+        hs.openKey = () => { q.push(openKeyToken); };
     if (ts.has('openString'))
-        hs.openString = () => q.push(openStringToken);
+        hs.openString = () => { q.push(openStringToken); };
     if (ts.has('openNumber'))
-        hs.openNumber = () => q.push(openNumberToken);
+        hs.openNumber = () => { q.push(openNumberToken); };
     if (ts.has('closeKey'))
-        hs.closeKey = () => q.push(closeKeyToken);
+        hs.closeKey = () => { q.push(closeKeyToken); };
     if (ts.has('closeString'))
-        hs.closeString = () => q.push(closeStringToken);
+        hs.closeString = () => { q.push(closeStringToken); };
     if (ts.has('end'))
-        hs.end = () => q.push(endToken);
+        hs.end = () => { q.push(endToken); };
     if (ts.has('key'))
-        hs.key = (key) => q.push({ type: 'key', key });
+        hs.key = (key) => { q.push({ type: 'key', key }); };
     if (ts.has('value'))
         hs.value = (value) => {
             if (value === true)
