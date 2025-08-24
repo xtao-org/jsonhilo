@@ -133,7 +133,7 @@ export const JsonLowToHigh = (next) => {
     },
     closeString: () => {
       mode = 'top'
-      if (bufferingEnabled == false) {
+      if (bufferingEnabled === false) {
         return next.value?.(stringBuffer)
       } else {
         // note: to prevent double-flushing
