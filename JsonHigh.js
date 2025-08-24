@@ -14,12 +14,12 @@ export const JsonHigh = (next) => {
     chunk(chunk) {
       for (const c of chunk) {
         const feedback = stream.codePoint(c.codePointAt(0))
-        const {closeNumberFeedback} = jsonLowToHighStream
-        if (closeNumberFeedback !== undefined) {
-          jsonLowToHighStream.closeNumberFeedback = undefined
+        const {_closeNumberFeedback} = jsonLowToHighStream
+        if (_closeNumberFeedback !== undefined) {
+          jsonLowToHighStream._closeNumberFeedback = undefined
           // note: this repetition...
-          if (closeNumberFeedback.type === JsonFeedbackType.error) {
-            throw Error(JSON.stringify(closeNumberFeedback, null, 2))
+          if (_closeNumberFeedback.type === JsonFeedbackType.error) {
+            throw Error(JSON.stringify(_closeNumberFeedback, null, 2))
           }
         }
         if (feedback === undefined) continue
@@ -36,10 +36,19 @@ export const JsonHigh = (next) => {
           throw Error(JSON.stringify(feedback, null, 2))
         }
       }
+      const feedback = jsonLowToHighStream._flushStringBuffer()
+      if (feedback !== undefined && feedback.type === JsonFeedbackType.error) {
+        // ...indeed...
+        throw Error(JSON.stringify(feedback, null, 2))
+      }
       return self
     },
     end() {
-      return stream.end()
+      const feedback = stream.end()
+      if (feedback !== undefined && feedback.type === JsonFeedbackType.error) {
+        throw Error(JSON.stringify(feedback, null, 2))
+      }
+      return feedback
     },
     depth() {
       return stream.depth()

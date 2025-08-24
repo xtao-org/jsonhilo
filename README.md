@@ -51,13 +51,13 @@ npm i @xtao-org/jsonhilo
 Import modules directly from [deno.land/x](https://deno.land/x):
 
 ```js
-import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.4.1/mod.js'
+import {JsonHigh} from 'https://deno.land/x/jsonhilo@v0.5.0-alpha.2/mod.js'
 ```
 
 Or from a CDN such as [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.4.1/mod.js'
+import {JsonHigh} from 'https://cdn.jsdelivr.net/gh/xtao-org/jsonhilo@v0.5.0-alpha.2/mod.js'
 ```
 
 <!-- An easy alternative that will work for all environments is to copy and use [`jsonhilo.bundle.js`](jsonhilo.bundle.js), e.g.:
@@ -290,15 +290,33 @@ The following handlers receive the buffer that should be consumed.
 
 * #### `maxStringBufferLength: number = Infinity`
 
+  See also: the similar [`bufferOnChunk`](#bufferOnChunk) option. These options can be combined. Differences between them are marked with a strong font.
+
   The maximum length of the key or string buffer, in code points.
 
-  If set, the `key` event handler won't be called and, for strings, the `value` event handler won't be called. 
+  If **set to a value in range `[1;Infinity)`**, the `key` event handler won't be called and, for strings, the `value` event handler won't be called. 
 
-  Instead, the `bufferKey` and `bufferString` handlers will be called as soon as the given number of code points has been collected or when the key/string is finished. 
+  Instead, the `bufferKey` and `bufferString` handlers will be called **as soon as the given number of code points has been collected** or when the key/string is finished. 
 
-  In the latter case the number of code points may be smaller than `maxStringBufferLength` and a `closeKey`/`closeString` handler will be called after the last `*Buffer` event to signal the finish. 
+  In the latter case **the number of code points may be smaller than `maxStringBufferLength`** and a `closeKey`/`closeString` handler will be called after the last `buffer*` event to signal the finish. 
 
-  This is useful when dealing with long strings where it's desirable to stream them piece-by-piece, e.g. when working with LLMs (Large Language Models). 
+  This is useful **when dealing with long strings** where it's desirable to stream them piece-by-piece, e.g. when working with LLMs (Large Language Models). 
+
+  See [Add support for incomplete key and value strings #10](https://github.com/xtao-org/jsonhilo/issues/10) for more information.
+
+<a id="bufferOnChunk"></a>
+
+* #### `bufferOnChunk: boolean = false`
+
+  See also: the similar [`maxStringBufferLength`](#maxStringBufferLength) option. These options can be combined. Differences between them are marked with a strong font.
+
+  If set to `true`, the `key` event handler won't be called and, for strings, the `value` event handler won't be called. 
+
+  Instead, the `bufferKey` and `bufferString` handlers will be called **as soon as the current chunk (passed in via the `.chunk()` method of the stream) has been processed** or when the key/string is finished. 
+
+  In the latter case a `closeKey`/`closeString` handler will be called after the last `buffer*` event to signal the finish.
+
+  This is useful **when it's desirable to stream strings or keys piece-by-piece, in sync with the chunks being received, without needing to specify a fixed buffer length;** e.g. when working with LLMs (Large Language Models).
 
   See [Add support for incomplete key and value strings #10](https://github.com/xtao-org/jsonhilo/issues/10) for more information.
 

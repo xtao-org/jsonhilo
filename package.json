@@ -2,22 +2,26 @@
   "type": "module",
   "name": "@xtao-org/jsonhilo",
   "description": "Pure JavaScript minimal lossless JSON parse event streaming, akin to SAX. Fast, modular, and dependency-free.",
-  "version": "0.4.0",
+  "version": "0.5.0-alpha.2",
   "main": "mod.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
   "scripts": {
     "test": "deno test --allow-read"
   },
   "files": [
     "mod.js",
-    "mod.d.ts",
+    "mod.ts",
     "JsonLow.js",
     "JsonLow.d.ts",
     "JsonHigh.js",
     "JsonHigh.d.ts",
     "JsonLowToHigh.js",
     "PosInfoAdapter.js",
-    "Ecma404.js"
+    "Ecma404.js",
+    "AsyncJsonHighGenerator.js",
+    "AsyncJsonHighGenerator.ts"
   ],
   "repository": {
     "type": "git",

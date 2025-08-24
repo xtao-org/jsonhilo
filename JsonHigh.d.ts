@@ -17,7 +17,7 @@ export type JsonHigh = <Feedback, End>(
   depth(): number,
   // todo: type for state()
 }
-export type JsonHighHandlers<Feedback, End> = {
+export type JsonHighOptions = {
   /**
    * ### Options
    */
@@ -59,6 +59,8 @@ export type JsonHighHandlers<Feedback, End> = {
    * 
    */
   parseNumbers?: boolean,
+}
+export type JsonHighHandlers<Feedback, End> = JsonHighOptions & {
 
   /**
    * ### Basic events
